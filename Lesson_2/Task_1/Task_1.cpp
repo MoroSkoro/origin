@@ -6,7 +6,7 @@ int main() {
     setlocale(LC_ALL, "Russian");
 
     enum months {
-        январь = 1,
+        январь =  1,
         февраль,
         март,
         апрель,
@@ -27,40 +27,40 @@ int main() {
         std::cin >> month;
         month_true = static_cast<months> (month);
         switch (month_true) {
-            case 1:
+        case months::январь:
                 std::cout << "январь \n";
                 break;
-            case 2:
+            case months::февраль:
                 std::cout << "февраль \n";
                 break;
-            case 3:
+            case months::март:
                 std::cout << "март \n";
                 break;
-            case 4:
+            case months::апрель:
                 std::cout << "апрель \n";
                 break;
-            case 5:
+            case months::май:
                 std::cout << "май \n";
                 break;
-            case 6:
+            case months::июнь:
                 std::cout << "июнь \n";
                 break;
-            case 7:
+            case months::июль:
                 std::cout << "июль \n";
                 break;
-            case 8:
+            case months::август:
                 std::cout << "август \n";
                 break;
-            case 9:
+            case months::сентябрь:
                 std::cout << "сентябрь \n";
                 break;
-            case 10:
+            case months::октябрь:
                 std::cout << "октябрь \n";
                 break;
-            case 11:
+            case months::ноябрь:
                 std::cout << "ноябрь \n";
                 break;
-            case 12:
+            case months::декабрь:
                 std::cout << "декабрь \n";
                 break;
             default:
