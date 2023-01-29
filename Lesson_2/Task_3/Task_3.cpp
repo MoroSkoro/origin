@@ -11,8 +11,7 @@ struct address {
     int index;
 };
 
-void operation(address& recipient) {
-    static int id = 1;
+void operation(address& recipient, int id) {
     std::cout << std::endl;
     std::cout << "Получатель: " << id << std::endl;
     std::cout << "Страна: " << recipient.country << std::endl;
@@ -22,7 +21,6 @@ void operation(address& recipient) {
     std::cout << "Номер квартиры: " << recipient.apartment << std::endl;
     std::cout << "Индекс: " << recipient.index << std::endl;
     std::cout << std::endl;
-    id++;
 }
 
 int main()
@@ -54,7 +52,7 @@ int main()
     recipients[1] = { "США", "Нью-Йорк", "Уолт Стрит", 5678, 432, 666666};
     recipients[2] = { "Никарагуа", "Манагуа", "Чегевары", 546, 390, 333333};
     for (int id = 0; id < 3; id++) {
-        operation(recipients[id]);
+        operation(recipients[id], id+1);
     }
     delete[] recipients;
 }
