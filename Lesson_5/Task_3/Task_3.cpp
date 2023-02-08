@@ -4,10 +4,7 @@
 
 class Figure {
 public:
-    Figure() {
-        sides_count = 0;
-        name = "Фигура";
-    }
+    Figure(int sides_count, std::string name) : sides_count(sides_count), name(name) {}
     int get_sides() {
         return sides_count;
     }
@@ -25,21 +22,54 @@ public:
     }
     ~Figure() {};
 protected:
-    int sides_count{ 0 };
-    std::string name{ 0 };
-    //bool control = true;
+    Figure() {
+        sides_count = 0;
+        name = "Фигура";
+    }
     virtual bool check() {
         if (sides_count == 0) { return true; }
         else { return false; }
     }
+private:
+    int sides_count{ 0 };
+    std::string name{ "Фигура" };
 };
 
 class Triangle : public Figure {
 public:
-    Triangle(int a, int b, int c, int A, int B, int C) : a(a), b(b), c(c), A(A), B(B), C(C)
+    Triangle(int a, int b, int c, int A, int B, int C) : Figure(3, "Треугольник")
     {
-        sides_count = 3;
-        name = "Треугольник";
+        this->a = a;
+        this->b = b;
+        this->c = c;
+        this->A = A;
+        this->B = B;
+        this->C = C;
+    }
+    Triangle(int a, int b, int c, int A, int B) :Figure(3, "Прямоугольный треугольник") {
+        this->a = a;
+        this->b = b;
+        this->c = c;
+        this->A = A;
+        this->B = B;
+        this->C = 90;
+    }
+    Triangle(int a, int b, int A, int B) :Figure(3, "Равнобедренный треугольник") {
+        this->a = a;
+        this->b = b;
+        this->c = a;
+        this->A = A;
+        this->B = B;
+        this->C = A;
+    }
+
+    Triangle(int a) :Figure(3, "Равносторонний треугольник") {
+        this->a = a;
+        this->b = a;
+        this->c = a;
+        this->A = 60;
+        this->B = 60;
+        this->C = 60;
     }
 
     int get_a() {
@@ -73,84 +103,40 @@ public:
     }
     ~Triangle() {};
 protected:
-    Triangle() {};
+    virtual bool check() override {
+        if ((get_sides() == 3) && ((A + B + C) == 180)) { return true; }
+        else { return false; }
+    }
+private:
     int a{ 1 };
     int b{ 1 };
     int c{ 1 };
     int A{ 1 };
     int B{ 1 };
-    int C{ 1 };
-    virtual bool check() override {
-        if ((sides_count == 3)&&((A+B+C)==180)) { return true; }
-        else { return false; }
-    }
+    int C{ 1 }; 
 };
 
 class Right_triangle : public Triangle {
 public:
-    Right_triangle(int a, int b, int c, int A, int B) {
-        sides_count = 3;
-        name = "Прямоугольный треугольник";
-        this->a = a;
-        this->b = b;
-        this->c = c;
-        this->A = A;
-        this->B = B;
-        this->C = 90;
-    }
+    Right_triangle(int a, int b, int c, int A, int B) :Triangle(a, b, c, A, B) {}
     ~Right_triangle() {};
-protected:
-    virtual bool check() override {
-        if ((sides_count == 3) && ((A + B + C) == 180)&&(C==90)) { return true; }
-        else { return false; }
-    }
 };
 
 class Isosceles_triangle : public Triangle {
 public:
-    Isosceles_triangle(int a, int b, int A, int B) {
-        sides_count = 3;
-        name = "Равнобедренный треугольник";
-        this->a = a;
-        this->b = b;
-        this->c = a;
-        this->A = A;
-        this->B = B;
-        this->C = A;
-    }
+    Isosceles_triangle(int a, int b, int A, int B) :Triangle(a, b, A, B) {}
     ~Isosceles_triangle() {};
-protected:
-    virtual bool check() override {
-        if ((sides_count == 3) && ((A + B + C) == 180) && (a == c)&&(A==C)) { return true; }
-        else { return false; }
-    }
 };
 
 class Equilateral_triangle : public Triangle {
 public:
-    Equilateral_triangle(int a) {
-        sides_count = 3;
-        name = "Равносторонний треугольник";
-        this->a = a;
-        this->b = a;
-        this->c = a;
-        this->A = 60;
-        this->B = 60;
-        this->C = 60;
-    }
+    Equilateral_triangle(int a) :Triangle(a) {}
     ~Equilateral_triangle() {};
-protected:
-    virtual bool check() override {
-        if ((sides_count == 3) && ((A + B + C) == 180) && ((a == b)&&(a == c)) && ((A == B)&&(A == C)&&(A==60))) { return true; }
-        else { return false; }
-    }
 };
 
 class Quadrangle : public Figure {
 public:
-    Quadrangle(int a, int b, int c, int d, int A, int B, int C, int D) {
-        sides_count = 4;
-        name = "Четырехугольник";
+    Quadrangle(int a, int b, int c, int d, int A, int B, int C, int D) : Figure(4, "Четырехугольник") {
         this->a = a;
         this->b = b;
         this->c = c;;
@@ -160,6 +146,47 @@ public:
         this->C = C;
         this->D = D;
     }
+    Quadrangle(int a, int b) : Figure(4, "Прямоугольник") {
+        this->a = a;
+        this->b = b;
+        this->c = a;;
+        this->d = b;
+        this->A = 90;
+        this->B = 90;
+        this->C = 90;
+        this->D = 90;
+    }
+    Quadrangle(int a) : Figure(4, "Квадрат") {
+        this->a = a;
+        this->b = a;
+        this->c = a;;
+        this->d = a;
+        this->A = 90;
+        this->B = 90;
+        this->C = 90;
+        this->D = 90;
+    }
+    Quadrangle(int a, int b, int A, int B) : Figure(4, "Параллелограмм") {
+        this->a = a;
+        this->b = b;
+        this->c = a;;
+        this->d = b;
+        this->A = A;
+        this->B = B;
+        this->C = A;
+        this->D = B;
+    }
+    Quadrangle(int a, int A, int B) : Figure(4, "Ромб") {
+        this->a = a;
+        this->b = a;
+        this->c = a;;
+        this->d = a;
+        this->A = A;
+        this->B = B;
+        this->C = A;
+        this->D = B;
+    }
+
     int get_a() {
         return a;
     }
@@ -197,7 +224,11 @@ public:
     }
     ~Quadrangle() {};
 protected:
-    Quadrangle() {};
+    virtual bool check() override {
+        if ((get_sides() == 4) && ((A + B + C + D) == 360)) { return true; }
+        else { return false; }
+    }
+private:
     int a;
     int b;
     int c;
@@ -206,104 +237,32 @@ protected:
     int B;
     int C;
     int D;
-protected:
-    virtual bool check() override {
-        if ((sides_count == 4) && ((A + B + C +D) == 360)) { return true; }
-        else { return false; }
-    }
 };
 
 class Rectangle : public Quadrangle {
 public:
-    Rectangle(int a, int b) {
-        sides_count = 4;
-        name = "Прямоугольник";
-        this->a = a;
-        this->b = b;
-        this->c = a;;
-        this->d = b;
-        this->A = 90;
-        this->B = 90;
-        this->C = 90;
-        this->D = 90;
-    }
+    Rectangle(int a, int b) :Quadrangle(a, b) {}
+    Rectangle(int a) :Quadrangle(a) {}
     ~Rectangle() {};
-protected:
-    Rectangle() {};
-    virtual bool check() override {
-        if ((sides_count == 4) && ((A + B + C + D) == 360)&&(a==c)&&(b==d)&&(A==B)&&(A==C)&&(A==D)&&(A==90)) { return true; }
-        else { return false; }
-    }
 };
 
 class Square : public Rectangle {
 public:
-    Square(int a) {
-        sides_count = 4;
-        name = "Квадрат";
-        this->a = a;
-        this->b = a;
-        this->c = a;;
-        this->d = a;
-        this->A = 90;
-        this->B = 90;
-        this->C = 90;
-        this->D = 90;
-    }
+    Square(int a) :Rectangle(a) {}
     ~Square() {};
-protected:
-    virtual bool check() override {
-        if ((sides_count == 4) && ((A + B + C + D) == 360) && (a == b) &&(a==c)&& (a == d) && (A == B) && (A == C) && (A == D) && (A == 90)) { return true; }
-        else { return false; }
-    }
 };
 
 class Parallelogram : public Quadrangle {
 public:
-    Parallelogram(int a, int b, int A, int B) {
-        sides_count = 4;
-        name = "Параллелограмм";
-        this->a = a;
-        this->b = b;
-        this->c = a;;
-        this->d = b;
-        this->A = A;
-        this->B = B;
-        this->C = A;
-        this->D = B;
-    }
+    Parallelogram(int a, int b, int A, int B) :Quadrangle(a, b, A, B) {}
+    Parallelogram(int a, int A, int B) :Quadrangle(a, A, B) {}
     ~Parallelogram() {};
-protected:
-    Parallelogram() {};
-protected:
-    virtual bool check() override {
-        if ((sides_count == 4) && ((A + B + C + D) == 360) && (a == c) && (b == d) && (A == C) && (B == D)) { return true; }
-        else { return false; }
-    }
 };
 
 class Phomb : public Parallelogram {
 public:
-    Phomb(int a, int A, int B) {
-        sides_count = 4;
-        name = "Ромб";
-        this->a = a;
-        this->b = a;
-        this->c = a;;
-        this->d = a;
-        this->A = A;
-        this->B = B;
-        this->C = A;
-        this->D = B;
-    }
+    Phomb(int a, int A, int B) :Parallelogram(a, A, B) {}
     ~Phomb() {};
-protected:
-    Phomb() {};
-protected:
-    virtual bool check() override {
-        if ((sides_count == 4) && ((A + B + C + D) == 360) && (a == b) && (a == c) && (a == d) && (A == C) && (B == D)) { return true; }
-        else { return false; }
-    }
 };
 
 int main()
@@ -312,7 +271,7 @@ int main()
     //SetConsoleOutputCP(1251);
     setlocale(LC_ALL, "Russian");
 
-    Figure f;
+    Figure f(0, "Фигура");
     Figure* ptr = &f;
     Triangle t(15, 15, 15, 60, 60, 60);
     Right_triangle r_t(3, 8, 12, 33, 57);
