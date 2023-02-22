@@ -1,0 +1,7 @@
+cmake_minimum_required(VERSION 3.22.0)
+include_directories("${PROJECT_SOURCE_DIR}/Figure")
+add_library(Triangle Triangle.cpp)
+add_library(Right_triangle Right_triangle.cpp)
+add_library(Isosceles_triangle Isosceles_triangle.cpp)
+add_library(Equilateral_triangle Equilateral_triangle.cpp)
+target_link_libraries(Triangle PUBLIC Figure)

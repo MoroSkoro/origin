@@ -1,0 +1,8 @@
+cmake_minimum_required(VERSION 3.22.0)
+include_directories("${PROJECT_SOURCE_DIR}/Figure")
+add_library(Quadrangle Quadrangle.cpp)
+add_library(Rectangle Rectangle.cpp)
+add_library(Parallelogram Parallelogram.cpp)
+add_library(Phomb Phomb.cpp)
+add_library(Square Square.cpp)
+target_link_libraries(Quadrangle PUBLIC Figure)
