@@ -11,3 +11,6 @@ Debug/
 .exp
 .pdb
 .json
+*.exp
+*.pdb
+*.json
