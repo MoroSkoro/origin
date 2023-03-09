@@ -72,15 +72,19 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LibraryPath>F:\Source\repos\Netology Home Work\Lesson_11\Task_2\Leaver\x64\Debug;$(LibraryPath)</LibraryPath>
+    <OutDir>..\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LibraryPath>F:\Source\repos\Netology Home Work\Lesson_11\Task_2\Leaver\x64\Debug;$(LibraryPath)</LibraryPath>
+    <OutDir>..\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LibraryPath>F:\Source\repos\Netology Home Work\Lesson_11\Task_2\Leaver\x64\Debug;$(LibraryPath)</LibraryPath>
+    <OutDir>..\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LibraryPath>F:\Source\repos\Netology Home Work\Lesson_11\Task_2\Leaver\x64\Debug;$(LibraryPath)</LibraryPath>
+    <OutDir>..\$(Configuration)\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

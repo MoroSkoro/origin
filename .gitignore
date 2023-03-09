@@ -7,3 +7,7 @@ x64/
 Variant.cpp
 out/
 Lesson_12/
+Debug/
+.exp
+.pdb
+.json

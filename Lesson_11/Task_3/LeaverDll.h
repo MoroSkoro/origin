@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 
-#ifdef LeaverDll_EXPORTS
+#ifdef LeaveDll_EXPORTS
 #define LeaverDll_API __declspec(dllexport)
 #else
 #define LeaverDll_API __declspec(dllimport)
