@@ -21,10 +21,9 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{6334fd9b-2022-4707-a39c-d6376560832f}</ProjectGuid>
-    <RootNamespace>Race</RootNamespace>
+    <ProjectGuid>{d4aa1a33-3368-4474-8aab-e650245edc73}</ProjectGuid>
+    <RootNamespace>Task2</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>Race</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -128,24 +127,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Boots_AllTerrain.cpp" />
-    <ClCompile Include="Camel.cpp" />
-    <ClCompile Include="CamelFast.cpp" />
-    <ClCompile Include="Centaur.cpp" />
-    <ClCompile Include="Race.cpp">
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">F:\Source\repos\Netology Home Work\Cursovic\Race\Race_Dll\Transport;F:\Source\repos\Netology Home Work\Cursovic\Race\Race_Dll\Transport\Ground_transport;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">F:\Source\repos\Netology Home Work\Cursovic\Race\Race_Dll\Transport;F:\Source\repos\Netology Home Work\Cursovic\Race\Race_Dll\Transport\Ground_transport;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">F:\Source\repos\Netology Home Work\Cursovic\Race\Race_Dll\Transport;F:\Source\repos\Netology Home Work\Cursovic\Race\Race_Dll\Transport\Ground_transport;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">F:\Source\repos\Netology Home Work\Cursovic\Race\Race_Dll\Transport;F:\Source\repos\Netology Home Work\Cursovic\Race\Race_Dll\Transport\Ground_transport;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-    </ClCompile>
-    <ClCompile Include="Transport.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="Boots_AllTerrain.h" />
-    <ClInclude Include="Camel.h" />
-    <ClInclude Include="CamelFast.h" />
-    <ClInclude Include="Centaur.h" />
-    <ClInclude Include="Transport.h" />
+    <ClCompile Include="Task_2.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

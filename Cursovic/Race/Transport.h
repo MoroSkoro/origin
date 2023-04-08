@@ -2,21 +2,17 @@
 #include <iostream>
 #include <string>
 
-//#ifdef Rase_Dll_EXPORTS
-//#define PROJECTAPI __declspec(dllexport)
-//#else
-//#define PROJECTAPI __declspec(dllimport)
-//#endif
 
-class  Transport
+class Transport
 {
 private:
-	double speed{0};
+	double speed{ 1 };
 	std::string name = "transport";
 	char type_transport = 't';
 protected:
-	double t{0};
+	double t{1};
 	double rest_time1{0};
+	virtual double rase();
 public:
 	Transport();
 	~Transport() {};
@@ -27,5 +23,6 @@ public:
 	void set_name(std::string name);
 	char get_type_transport();
 	void set_type_transport(char);
+	double get_t();
 };
 
