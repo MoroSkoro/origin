@@ -10,13 +10,13 @@ int main()
 
     std::vector<int> vec = { 11,22,33,44,55,66 };
     std::cout << "Входные данные: ";
-    for (auto var : vec){
+    for (auto var : vec){ //здесь for-each
         std::cout << var << " ";
     }
     std::cout << "\n";
 
     std::cout << "Выходные данные: ";
-    for (auto var : vec) {
+    for (auto var : vec) { // и здесь for-each
         [&var]{
             if (var % 2 != 0) {
                 std::cout << (var * 3) << " ";
