@@ -21,15 +21,17 @@ public:
 	}
 
 	smart_array& operator=(const smart_array& other){
-		if (size > 0) // освободить предварительно выделенную память
-			delete[] arr;
+		if (this != &other) {
+			if (size > 0) // освободить предварительно выделенную память
+				delete[] arr;
 
-		size = other.size;
-		arr = new int[size];
-		for (size_t i = 0; i < size; i++) {
-			arr[i] = other.arr[i];
+			size = other.size;
+			arr = new int[size];
+			for (size_t i = 0; i < size; i++) {
+				arr[i] = other.arr[i];
+			}
+			actual_size = other.actual_size;
 		}
-		actual_size = other.actual_size;
 		return *this;
 	}
 

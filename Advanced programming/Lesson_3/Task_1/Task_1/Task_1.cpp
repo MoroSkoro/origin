@@ -11,6 +11,10 @@ public:
 		this->size = size;
 		arr = new int [size] {0};
 	}
+
+	smart_array(smart_array&) = delete;
+	smart_array& operator = (const smart_array&) = delete;
+
 	~smart_array() { delete[] arr; };
 	void add_element(int value){
 		if (value > 2000000) {
