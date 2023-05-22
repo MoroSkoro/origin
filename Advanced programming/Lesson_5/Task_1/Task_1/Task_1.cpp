@@ -2,41 +2,39 @@
 #include <vector>
 
 template <typename T>
-void squ(T& a) {
-    int n = a * a;
-    std::cout << "[IN]: " << a << "\n";
-    std::cout << "[OUT]: " << n << "\n";
+T& squ(T& a) {
+    a = a * a;
+    return a;
 }
 
 template <>
-void squ(std::vector<int>& a) {
-    std::vector<int> n = a;
+std::vector<int>& squ(std::vector<int>& a) {
     size_t x{ 0 };
-
-    for (auto i : n) {
-        n[x] = i * i;
+    for (auto i : a) {
+        a[x] = i * i;
         x++;
     }
-
-    std::cout << "\n";
-    std::cout << "[IN]: ";
-    for (auto i : a) {
-       std::cout << i << " ";
-    }
-
-    std::cout << "\n";
-    std::cout << "[OUT]: ";
-    for (auto i : n) {
-        std::cout << i << " ";
-    }
-    
+    return a;
 }
 
 int main()
 {
     int a = 4;
-    squ(a);
+    
+    std::cout << "[IN]: " << a << "\n";
+    std::cout << "[OUT]: " << squ(a) << "\n";
+    std::cout << "\n";
 
     std::vector<int> arr{ -1, 4, 8 };
+    std::cout << "[IN]: ";
+    for (auto i : arr) {
+        std::cout << i << " ";
+    }
+
+    std::cout << "\n";
+    std::cout << "[OUT]: ";
     squ(arr);
+    for (auto i : arr) {
+        std::cout << i << " ";
+    }
 }

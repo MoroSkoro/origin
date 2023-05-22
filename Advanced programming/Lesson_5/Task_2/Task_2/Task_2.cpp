@@ -4,12 +4,30 @@ template <class T>
 class table {
 private:
     class sub_mas{
+        size_t size = 0;
     public:
         T* arr_columns;
         sub_mas(){}
-        sub_mas(size_t size) {
+        sub_mas(size_t siz): size(siz) {
             arr_columns = new T[size]{};
         }
+        ~sub_mas(){}
+
+        sub_mas(const sub_mas&) = delete;
+        sub_mas& operator=(const sub_mas& other){
+            if (this != &other) {
+                if (size > 0)
+                    delete[] arr_columns;
+
+                size = other.size;
+                arr_columns = new T[size];
+                for (size_t i = 0; i < size; i++) {
+                    arr_columns[i] = other.arr_columns[i];
+                }
+            }
+            return *this;
+        }
+
         T& operator [] (size_t i){
             return arr_columns[i];
         }
@@ -29,6 +47,10 @@ public:
             rows[i] = sub_mas(num_columns);
         }
     }
+
+    table(const table&) = delete;
+    table& operator=(const table&) = delete;
+
     ~table(){
         for (size_t i = 0; i < num_rows; i++) {
             if (rows[i].arr_columns != nullptr)

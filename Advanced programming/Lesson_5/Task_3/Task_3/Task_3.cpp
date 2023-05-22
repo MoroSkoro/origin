@@ -29,11 +29,15 @@ int main(){
     for_each(vec.begin(), vec.end(), [](double i) {std::cout << i << " "; });
     std::cout << "\n\n";
 
-    std::vector<double>::iterator Iter1;
+    /*std::vector<double>::iterator Iter1;
     for (Iter1 = vec.begin(); Iter1 != vec.end(); Iter1++) {
         sf(*Iter1);
-    };
+    };*/
+
+    sf = for_each(vec.begin(), vec.end(), sf);
 
     std::cout << "[OUT]: get_sum() = " << sf.get_sum() << "\n";
     std::cout << "[OUT]: get_count() = " << sf.get_count() << "\n";
+
+
 }
