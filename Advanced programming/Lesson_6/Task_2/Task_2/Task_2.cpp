@@ -1,36 +1,31 @@
 ﻿#include <iostream>
-#include <string>
 #include <windows.h>
-#include <map>
+#include <set>
+#include <vector>
 
 int main() {
     SetConsoleCP(1251);
     SetConsoleOutputCP(1251);
     setlocale(LC_ALL, "Russian");
 
-    std::string text;
-    size_t count = 0;
-    typedef std::pair <size_t, char> char_pair;
-    std::map<char, size_t, std::less<>> char_num;
-    /*std::cout << "Введите сроку\n";
-    std::getline(std::cin, text);*/
+    size_t size;
+    std::set<int, std::greater<>> no_dupl;
+
+    std::cout << "Введите количество элементов, далее сами значения:\n";
+    std::cin >> size;
+    std::vector<int> vec(size); //= { 1, 5, 1, 3, 4, 4 };
+    for (size_t i = 0; i < size; i++) {
+        std::cout << "Введите " << i + 1 << " число: ";
+        std::cin >> vec[i];
+        no_dupl.insert(vec[i]);
+    }
+
     std::cout << "\n";
-    text = "Hello world!!";
-    for (auto& s : text) {
-        count = 0;
-        count = std::count(text.begin(), text.end(), s);
-        char_num[s] = count;
-    }
-
-    std::multimap<size_t, char, std::greater<>> char_num1;
-    for (auto& s : char_num) {
-        char_num1.insert(char_pair(s.second, s.first));
-    }
-
-    std::cout << "[IN]: " << text << "\n";
-    std::cout << "[OUT]: " << "\n\n";
-
-    for (const auto& [f, s] : char_num1) {
-        std::cout << s << ": " << f << "\n" << std::endl;
-    }
+    std::cout << "[IN]:\n";
+    std::cout << size << "\n";
+    for (auto a : vec) { std::cout << a << "\n"; }
+   
+    std::cout << "OUT:\n";
+    for (auto a : no_dupl) { std::cout << a << "\n"; }
+    system("pause");
 }
