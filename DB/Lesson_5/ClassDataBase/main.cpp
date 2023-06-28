@@ -10,19 +10,19 @@
 class Working_with_database {
 	
 	std::unique_ptr<pqxx::connection> c;
-	pqxx::work tx;
+	//pqxx::work tx;
 public:
-	Working_with_database(std::unique_ptr<pqxx::connection>& l) : c{ std::move(l) }, tx{*c} {
-		
-	}
-	~Working_with_database() { tx.commit(); };
+	Working_with_database(std::unique_ptr<pqxx::connection>& l) : c{ std::move(l) } {}
+	~Working_with_database() { };
 
 	void create_table(std::string& z, std::string& z1) {
-
+		pqxx::work tx{ *c };
 		tx.exec("CREATE TABLE IF NOT EXISTS " + tx.esc(z) + " ("+ z1 +");"); //как здесь реалтзовать защиту от SQL инъекций?
+		tx.commit();
 	}
 
 	void add_client() {
+		pqxx::work tx{ *c };
 		std::string z;
 		std::vector<std::string> v;
 		std::cout << "Введите имя клиента: ";
@@ -51,10 +51,11 @@ public:
 					+ " (SELECT id FROM Clients WHERE email LIKE '" + tx.esc(v[2]) + "'));");
 			};
 		}
-
+		tx.commit();
 	}
 
 	void add_phone() {
+		pqxx::work tx{ *c };
 		std::string z;
 		std::vector<std::string> v;
 		std::cout << "Введите email клиента для которого нужно добавить телефон: ";
@@ -74,10 +75,11 @@ public:
 				tx.exec("INSERT INTO Phones (number, client_id) VALUES ('" + tx.esc(v[i]) + "', "
 					+ " (SELECT id FROM Clients WHERE email LIKE '" + tx.esc(v[0]) + "'));");
 		}
-
+		tx.commit();
 	}
 
 	void update_client() {
+		pqxx::work tx{ *c };
 		std::string z, z1;
 		std::vector<std::string> v;
 		std::cout << "Введите email клиента для которого нужно изменить данные или номер телефона если нужно изменить телефон: ";
@@ -100,23 +102,29 @@ public:
 
 		tx.exec("UPDATE " + tx.esc(v[1]) + " SET " + tx.esc(v[2]) + " = '"
 				+ tx.esc(v[3]) + "' WHERE "+z1+" LIKE '" + tx.esc(v[0]) + "'; ");
+		tx.commit();
 	}
 
 	void delete_phone() {
+		pqxx::work tx{ *c };
 		std::string z;
 		std::cout << "Введите номер телефона который нужно удалить: ";
 		std::cin >> z;
 		tx.exec("DELETE FROM Phones WHERE number = '" + tx.esc(z) + "'; ");
+		tx.commit();
 	}
 
 	void delete_client() {
+		pqxx::work tx{ *c };
 		std::string z;
 		std::cout << "Введите email клиента которого нужно удалить: ";
 		std::cin >> z;
 		tx.exec("DELETE FROM Clients WHERE email = '" + tx.esc(z) + "'; ");
+		tx.commit();
 	}
 
 	void select_client() {
+		pqxx::work tx{ *c };
 		std::string z;
 		std::cout << "Введите данные клиента (имя, фамилию, email или телефон): ";
 		std::cin >> z;
@@ -129,7 +137,7 @@ public:
 		{
 			std::cout << "Client is: " << name << " " << lastname << " " << email << " " << number << ".\n";
 		}
-		
+		tx.commit();
 	}
 };
 
