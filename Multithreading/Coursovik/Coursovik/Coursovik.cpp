@@ -55,14 +55,14 @@ private:
 
     std::function<void()> pop() {
         std::function<void()> elem;
-        _m1.lock();
+        _m.lock();
         if (!task_que.empty()) {
             elem = task_que.front();
             task_que.pop();
             task++;
         }
         else elem = func_sleep;
-        _m1.unlock();
+        _m.unlock();
         return elem;
     }
 
@@ -73,9 +73,10 @@ class thread_pool {
     std::mutex _m;
     std::vector<std::thread> th_v;
     size_t _n;
+    std::atomic<bool> exit {false};
+    std::condition_variable _data_condition;
 
 public:
-
     thread_pool(size_t& num_cores, safe_queue& que, size_t& n): _n(n) {
         for (int i = 0; i < num_cores; i++) {
             th_v.push_back(std::thread(&thread_pool::work, this, std::ref(que)));
@@ -90,14 +91,19 @@ public:
 private:
 
     void work(safe_queue& que) {
-        _m.lock();
-        std::cout << "work id: " << std::this_thread::get_id() << std::endl;
-        _m.unlock();
         std::function<void()> f;
-        while (!flg) {
+        bool w = true;
+        while (!flg && !exit) {
+            if (w) {
+                _m.lock();
+                std::cout << "work id: " << std::this_thread::get_id() << std::endl;
+                _m.unlock();
+                w = false;
+            }
+
             f = que.pop();
             f();
-            if (task == 2 * _n) flg = true;
+            if (task == 2 * _n) flg = true; //Здесь выход по счетчику задач
         }
         
     }
@@ -105,6 +111,11 @@ private:
 public:
     void submit(safe_queue& que, std::function<void()> f) {
         que.push(f);
+    }
+
+    void _exit(std::string message) {
+        std::this_thread::sleep_for(3s);
+        if (message == "exit") { exit = true; };
     }
 };
 
@@ -130,12 +141,19 @@ int main(){
 
     size_t num_cores = std::thread::hardware_concurrency();
     std::cout << "Количество аппартных ядер - " << num_cores << "\n\n";
-    size_t n{ 7 };
+    size_t n{ 8 }; //Требуемое колличество выполненых задач
+   
     safe_queue que;
     thread_pool thr(num_cores, que, n);
 
     std::thread th1(addF1, std::ref(n), std::ref(que), std::ref(thr));
     std::thread th2(addF2, std::ref(n), std::ref(que), std::ref(thr));
+    
+
+    thr._exit("exit"); //Дополнительная функция выхода по внешнему сообщению
+    
+    std::cout << "Выполнено " << task << " задач." << std::endl;
+
     if (th1.joinable()) th1.join();
     if (th2.joinable()) th2.join();
 
