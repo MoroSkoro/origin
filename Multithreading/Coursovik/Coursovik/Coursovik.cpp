@@ -83,6 +83,7 @@ public:
         }
     }
     ~thread_pool(){
+        flg=true;
         for (auto& th : th_v){
             if (th.joinable()) th.join();
         }
