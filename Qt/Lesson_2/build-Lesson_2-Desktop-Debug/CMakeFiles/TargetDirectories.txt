@@ -1,0 +1,8 @@
+F:/Qt/Projects/Lesson_2/build-Lesson_2-Desktop-Debug/CMakeFiles/Lesson_2.dir
+F:/Qt/Projects/Lesson_2/build-Lesson_2-Desktop-Debug/CMakeFiles/edit_cache.dir
+F:/Qt/Projects/Lesson_2/build-Lesson_2-Desktop-Debug/CMakeFiles/rebuild_cache.dir
+F:/Qt/Projects/Lesson_2/build-Lesson_2-Desktop-Debug/CMakeFiles/list_install_components.dir
+F:/Qt/Projects/Lesson_2/build-Lesson_2-Desktop-Debug/CMakeFiles/install.dir
+F:/Qt/Projects/Lesson_2/build-Lesson_2-Desktop-Debug/CMakeFiles/install/local.dir
+F:/Qt/Projects/Lesson_2/build-Lesson_2-Desktop-Debug/CMakeFiles/install/strip.dir
+F:/Qt/Projects/Lesson_2/build-Lesson_2-Desktop-Debug/CMakeFiles/Lesson_2_autogen.dir
