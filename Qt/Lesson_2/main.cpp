@@ -16,6 +16,6 @@ int main(int argc, char *argv[])
      QHostAddress adr;
      QTcpSocket sock;
 
-    if (exit) {return 0;};
-    return a.exec();
+    if (exit) {a.exit();}
+    else return a.exec();
 }
