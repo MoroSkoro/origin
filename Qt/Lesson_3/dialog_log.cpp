@@ -12,3 +12,16 @@ Dialog_log::~Dialog_log()
 {
     delete ui;
 }
+
+void Dialog_log::on_buttonBox_accepted()
+{
+    ui->lineE_nameBD->setText("Postgres");
+    accept();
+}
+
+
+void Dialog_log::on_buttonBox_rejected()
+{
+    reject();
+}
+

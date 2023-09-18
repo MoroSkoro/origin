@@ -1,3 +1,0 @@
-F:\Qt\Tools\CMake_64\bin\cmake.exe -E rm -f CMakeFiles\Lesson_3.dir/objects.a
-F:\Qt\Tools\mingw1120_64\bin\ar.exe qc CMakeFiles\Lesson_3.dir/objects.a @CMakeFiles\Lesson_3.dir\objects1.rsp
-F:\Qt\Tools\mingw1120_64\bin\g++.exe -DQT_QML_DEBUG -g -mwindows -Wl,--whole-archive CMakeFiles\Lesson_3.dir/objects.a -Wl,--no-whole-archive -o Lesson_3.exe -Wl,--out-implib,libLesson_3.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\Lesson_3.dir\linklibs.rsp

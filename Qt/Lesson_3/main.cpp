@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+#include "dialog_log.h"
 #include <QtCore>
 #include <QtNetwork>
 #include <QtSql>

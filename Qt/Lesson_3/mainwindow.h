@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 #include "dialog_log.h"
+#include <QTime>
+#include <QLabel>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -19,8 +21,12 @@ public:
 private slots:
     void on_pushButton_clicked();
 
+
 private:
     Ui::MainWindow *ui;
     Dialog_log* dialog;
+
+    void timerEvent(QTimerEvent *event);
+
 };
 #endif // MAINWINDOW_H
