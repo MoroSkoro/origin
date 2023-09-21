@@ -21,7 +21,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->pb_1->setText("ВЫКЛ");
     ui->pb_1->setCheckable(true);
-    ui->pb_1->toggled(false);
+    ui->pb_1->toggled(true);
 
 }
 
@@ -30,23 +30,30 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-
-void MainWindow::on_pb_1_toggled(bool checked){
+void MainWindow::on_pb_1_clicked(){
     qint8 v = ui->prBar->value();
     if(ui->pb_1->isChecked()){
         ui->pb_1->setStyleSheet("QPushButton {background-color:lightgreen}");
         ui->pb_1->setText("ВКЛ");
-        if(v < 10){
-            v+=1;
-            ui->prBar->setValue(v);
-        }
-        else {
-            v=0;
-            ui->prBar->setValue(v);
-        }
+
     }
     else {
         ui->pb_1->setStyleSheet("QPushButton {background-color:lightcoral}");
         ui->pb_1->setText("ВЫКЛЮЧЕНО");
     }
+
+    if(v < 10){
+        v+=1;
+        ui->prBar->setValue(v);
+    }
+    else {
+        v=0;
+        ui->prBar->setValue(v);
+    }
+}
+
+
+void MainWindow::on_pb_1_toggled(bool checked){
+    ui->pb_1->setStyleSheet("QPushButton {background-color:lightcoral}");
+    ui->pb_1->setText("ВЫКЛЮЧЕНО");
 }

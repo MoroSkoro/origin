@@ -16,7 +16,7 @@ public:
     ~MainWindow();
 
 private slots:
-
+    void on_pb_1_clicked();
     void on_pb_1_toggled(bool checked);
 
 private:
