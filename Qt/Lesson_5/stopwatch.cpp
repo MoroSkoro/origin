@@ -5,7 +5,7 @@ Stopwatch::Stopwatch(QObject* parent)
 {
 
    _s.setHMS(0,0,0,0);
-    connect(_timer, SIGNAL(timeout()), SLOT(updateTimer()));
+    connect(_timer, &QTimer::timeout, this, &Stopwatch::updateTimer);
 }
 
 void Stopwatch::updateTimer(){
