@@ -17,10 +17,10 @@ public:
     int _cikles=0;
     int _cikle_ss;
     int _cikle_ms;
-    int cikle_i=0;
-    bool cikle_true = false;
-    QTime _s;
-    QString _mg;
+    int _last_ss;
+    int _last_ms;
+    int _show_ss;
+    int _show_ms;
 
 public:
     explicit Stopwatch(QObject *parent = nullptr);

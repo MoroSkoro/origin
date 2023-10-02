@@ -31,7 +31,6 @@ private slots:
 private:
     Ui::MainWindow *ui;
     Stopwatch*  st;
-    QTime s;
     QString mg_ss, mg_ms;
     QString cikles, cikle_ss, cikle_ms;
     QString cikle_mg ="";
