@@ -16,6 +16,9 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+signals:
+    void cikle_click();
+
 private slots:
     void slotUpdateTime();
 
@@ -30,6 +33,8 @@ private:
     Stopwatch*  st;
     QTime s;
     QString mg_ss, mg_ms;
+    QString cikles, cikle_ss, cikle_ms;
+    QString cikle_mg ="";
     int ms;
     int ss;
 };

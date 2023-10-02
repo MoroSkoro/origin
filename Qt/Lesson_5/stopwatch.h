@@ -1,4 +1,3 @@
-//#pragma once
 #ifndef STOPWATCH_H
 #define STOPWATCH_H
 
@@ -15,6 +14,11 @@ public:
     int _ss =0;
     int _ms =0;
     int i=0;
+    int _cikles=0;
+    int _cikle_ss;
+    int _cikle_ms;
+    int cikle_i=0;
+    bool cikle_true = false;
     QTime _s;
     QString _mg;
 
@@ -27,6 +31,7 @@ public:
 
 public slots:
     void updateTimer();
+    void cikle_start();
 };
 
 #endif // STOPWATCH_H
