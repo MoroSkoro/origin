@@ -65,9 +65,7 @@ void MainWindow::on_pButton_reset_clicked(){
 
 void MainWindow::on_pButton_cikle_clicked(){
     emit cikle_click();
-
-    cikle_mg = cikle_mg+"\nКруг: "+cikles.number(st->_cikles)+", время: "+cikle_ss.number(st->_show_ss)+"."+cikle_ms.number(st->_show_ms)+" сек";
-
-    ui->textB_time->setText(cikle_mg);
+    cikle_mg = "Круг: "+cikles.number(st->_cikles)+", время: "+cikle_ss.number(st->_show_ss)+"."+cikle_ms.number(st->_show_ms)+" сек";
+    ui->textB_time->append(cikle_mg);
 }
 
