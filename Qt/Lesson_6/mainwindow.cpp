@@ -37,7 +37,7 @@ MainWindow::MainWindow(QWidget *parent)
             countFinish++;
         }
         else{
-            ui->te_debug->append("Искомое число равно: " + QString::number(number) + ", а должно быть " +
+            ui->te_debug->append("Искомое число равно: " + QString::number(number) + ", а должно быть "+
                                  QString::number(ui->sb_initNum->value()*2));
             ui->pb_start->setEnabled(true);
         }
@@ -68,6 +68,12 @@ MainWindow::MainWindow(QWidget *parent)
             ui->pb_start->setEnabled(true);
         }
     });
+
+    connect(&ftWhWork1, &QFutureWatcher<void>::finished, this, [&]{
+        futureRace2 = QtConcurrent::run(concurRace2->DoWork, concurRace2,
+                                        &number, ui->rb_mutexOn->isChecked(), ui->sb_initNum->value());
+        //ftWhWork2.setFuture(futureRace2);
+    });
 }
 
 MainWindow::~MainWindow()
@@ -77,16 +83,33 @@ MainWindow::~MainWindow()
 
 //Метод запускает два потока
 void MainWindow::StartRace(void){
-
+//number = 0;
 
     if(ui->rb_qtConcur->isChecked()){
 
         //ui->te_debug->append("Выполни ДЗ!");
         //Тут должен быть код ДЗ
-        QFuture <void> futureRace1 = QtConcurrent::run(concurRace1->DoWork, concurRace1,
-                                         &number, ui->rb_mutexOn->isChecked(), ui->sb_initNum->value() );
-        QFuture <void> futureRace2 = QtConcurrent::run(concurRace2->DoWork, concurRace2,
-                                         &number, ui->rb_mutexOn->isChecked(), ui->sb_initNum->value() );
+
+//              Вариант 1. Но в DoWork нужно мьютексы включить.
+//        QFuture <void> futureRace1 = QtConcurrent::run(concurRace1->DoWork, concurRace1,
+//                                                      &number, ui->rb_mutexOn->isChecked(), ui->sb_initNum->value() );
+//        QFuture <void> futureRace2 = QtConcurrent::run(concurRace2->DoWork, concurRace2,
+//                                                      &number, ui->rb_mutexOn->isChecked(), ui->sb_initNum->value() );
+
+//              Вариант 2. Последовательно.
+//        QtConcurrent::run([&]{concurRace1->DoWork(&number, ui->rb_mutexOn->isChecked(), ui->sb_initNum->value());}).
+//                        then([&]{concurRace2->DoWork(&number, ui->rb_mutexOn->isChecked(), ui->sb_initNum->value());});
+
+
+//              Вариант 3. С Watcher.
+//        futureRace1 = QtConcurrent::run(concurRace1->DoWork, concurRace1,
+//                          &number, ui->rb_mutexOn->isChecked(), ui->sb_initNum->value());
+//        ftWhWork1.setFuture(futureRace1);
+
+//              Вариант 4. Последовательно с лямдой.
+                auto wk1 = [&]{concurRace1->DoWork(&number, ui->rb_mutexOn->isChecked(), ui->sb_initNum->value());};
+                auto wk2 = [&]{concurRace2->DoWork(&number, ui->rb_mutexOn->isChecked(), ui->sb_initNum->value());};
+                QtConcurrent::run(wk1).then(wk2);
 
     }
     else{

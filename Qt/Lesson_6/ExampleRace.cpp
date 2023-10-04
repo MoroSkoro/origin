@@ -13,7 +13,9 @@ void ExampleRace::DoWork(uint32_t* num, bool mutexOn, int numIterat)
     }
     else{
         for(uint32_t i = 0; i < numIterat; i++){
+            //mut->lock();
             (*num)++;
+            //mut->unlock();
         }
     }
 

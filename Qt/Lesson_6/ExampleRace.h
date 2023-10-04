@@ -15,6 +15,7 @@ public:
     ExampleRace(QMutex* m) : mut(m){
     }
     //Передаем указатель на переменную которую будем инкрементировать, флак включения мьютексов, и количесво итераций
+//public slots:
     void DoWork(uint32_t* inc, bool mutexOn, int numIterat);
 
 signals:
