@@ -11,9 +11,9 @@ class Stopwatch : public QObject
 
 public:
     QTimer *_timer = new QTimer(this);
+    int _ms_total =0;
     int _ss =0;
     int _ms =0;
-    int i=0;
     int _cikles=0;
     int _cikle_ss;
     int _cikle_ms;
@@ -28,6 +28,9 @@ public:
     void m_time_start ();
     void m_time_stop ();
     void m_time_reset();
+
+signals:
+    void lbUpdate();
 
 public slots:
     void updateTimer();

@@ -15,7 +15,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->lb_time->setText("Время: 00.0");
 
     st = new Stopwatch(this);
-    connect(st->_timer, &QTimer::timeout, this, &MainWindow::slotUpdateTime);
+    connect(st, st->lbUpdate, this, &MainWindow::slotUpdateTime);
     connect(this, &MainWindow::cikle_click, st, st->cikle_start);
 }
 
@@ -30,8 +30,7 @@ void MainWindow::slotUpdateTime(){
     ui->lb_time->setText("Время: "+mg_ss.number(ss)+"."+mg_ms.number(ms));
 }
 
-void MainWindow::on_pButton_start_clicked()
-{
+void MainWindow::on_pButton_start_clicked(){
     if(ui->pButton_start->isChecked()){
         st->m_time_start();
         ui->pButton_start->setStyleSheet("QPushButton {background-color:lightcoral}");

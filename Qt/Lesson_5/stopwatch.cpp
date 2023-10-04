@@ -7,16 +7,10 @@ Stopwatch::Stopwatch(QObject* parent)
 }
 
 void Stopwatch::updateTimer(){
-    ++i;
-   if(i<10){
-       ++_ms;
-    }
-    if(i==10){
-       _ms=0;
-       _ss++;
-       i=0;
-    }
-
+    ++_ms_total;
+    _ss = _ms_total/10;
+    _ms = _ms_total%10;
+    emit lbUpdate();
 }
 
 void Stopwatch::m_time_start(){
@@ -28,33 +22,21 @@ void Stopwatch::m_time_stop(){
 }
 
 void Stopwatch::m_time_reset(){
-    _ss = 0;
-    _ms = 0;
-    i = 0;
-
-    _cikle_ss=0;
-    _cikle_ms=0;
+    _ms_total=0;
     _cikles=0;
 }
 
 void Stopwatch::cikle_start(){
+    _cikle_ms=_ms_total;
     if(_cikles==0){
-       _last_ss=_ss;
-       _last_ms=_ms;
-       _show_ss=_last_ss;
-       _show_ms=_last_ms;
+       _show_ss = _cikle_ms/10;
+       _show_ms = _cikle_ms%10;
     }
     else{
-       _cikle_ss = _ss;
-       _cikle_ms = _ms;
-       _show_ss = _cikle_ss - _last_ss;
-       if(_cikle_ms >= _last_ms){_show_ms = _cikle_ms - _last_ms;}
-       else{
-           --_show_ss;
-           _show_ms = 100+_cikle_ms - _last_ms;
-       }
-       _last_ss = _cikle_ss;
-       _last_ss = _cikle_ss;
+       _show_ss = (_cikle_ms - _last_ms)/10;
+       _show_ms = (_cikle_ms - _last_ms)%10;
     }
+       _last_ms=_cikle_ms;
+
     ++_cikles;
 }
