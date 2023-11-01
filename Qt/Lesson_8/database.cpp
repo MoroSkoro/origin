@@ -83,27 +83,14 @@ void DataBase::RequestToDB(QString request, int& typeRequest){
         }
         break;
     }
-    case requestHorrors:{
-        modelQuery->setQuery(request, *dataBase);
-
-        modelQuery->setHeaderData(0, Qt::Horizontal, tr("Название фильма"));
-        modelQuery->setHeaderData(1, Qt::Horizontal, tr("Описание фильма"));
-        modelQuery->setHeaderData(2, Qt::Horizontal, tr("Год выпуска"));
-        modelQuery->setHeaderData(3, Qt::Horizontal, tr("Жанр"));
-
-        if(modelQuery->lastError().isValid()){
-            err = modelQuery->lastError();
-        }
-
-        break;
-    }
+    case requestHorrors:
     case requestComedy:{
         modelQuery->setQuery(request, *dataBase);
 
         modelQuery->setHeaderData(0, Qt::Horizontal, tr("Название фильма"));
         modelQuery->setHeaderData(1, Qt::Horizontal, tr("Описание фильма"));
-        modelQuery->setHeaderData(2, Qt::Horizontal, tr("Год выпуска"));
-        modelQuery->setHeaderData(3, Qt::Horizontal, tr("Жанр"));
+//        modelQuery->setHeaderData(2, Qt::Horizontal, tr("Год выпуска"));
+//        modelQuery->setHeaderData(3, Qt::Horizontal, tr("Жанр"));
 
         if(modelQuery->lastError().isValid()){
             err = modelQuery->lastError();

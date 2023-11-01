@@ -57,12 +57,12 @@ private:
                           "JOIN film_category fc on f.film_id = fc.film_id "
                           "JOIN category c on c.category_id  = fc.category_id";
 
-    QString request_comedy = "SELECT title, description, release_year, c.name  FROM film f "
+    QString request_comedy = "SELECT title, description FROM film f "
                              "JOIN film_category fc on f.film_id = fc.film_id "
                              "JOIN category c on c.category_id  = fc.category_id "
                              "WHERE c.name LIKE '%Comedy%'";
 
-    QString request_horro = "SELECT title, description, release_year, c.name  FROM film f "
+    QString request_horro = "SELECT title, description  FROM film f "
                             "JOIN film_category fc on f.film_id = fc.film_id "
                             "JOIN category c on c.category_id  = fc.category_id "
                             "WHERE c.name LIKE '%Horror%'";
