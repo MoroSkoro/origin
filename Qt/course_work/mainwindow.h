@@ -61,7 +61,7 @@ private:
     int m_howClosed_msg = QMessageBox::Cancel;
     bool m_RetryClosed_msg =false;
     QString requestAirport;
-    DialogStatistics* DialogStatistic;
+    DialogStatistics* dialogStatistic;
 
 public:
     QList<QPair<QString,QString>> *values;

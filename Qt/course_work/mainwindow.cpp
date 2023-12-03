@@ -53,12 +53,12 @@ MainWindow::MainWindow(QWidget *parent)
     ui->pushBut_Request->setDisabled(true);
     ui->pushBut_Statist->setDisabled(true);
 
-    DialogStatistic = new DialogStatistics(this);
-    connect(DialogStatistic, &DialogStatistics::signal_chart, this, &MainWindow::sl_monthStatistic);
     yearBar = new StatisticBar(this);
     plot = new StatisticPlot(this);
-    DialogStatistic->ui->graphicsView->setChart(plot->chart);
-    DialogStatistic->ui->graphicsView->setRenderHint(QPainter::Antialiasing);
+    dialogStatistic = new DialogStatistics(this);
+    connect(dialogStatistic, &DialogStatistics::signal_chart, this, &MainWindow::sl_monthStatistic);
+    dialogStatistic->ui->graphicsView->setChart(plot->chart);
+    dialogStatistic->ui->graphicsView->setRenderHint(QPainter::Antialiasing);
 
     //this->autoConnect();
 }
@@ -235,9 +235,9 @@ void MainWindow::on_pushBut_Request_clicked(){
 void MainWindow::on_pushBut_Statist_clicked()
 {
     QString airportName = "Аэропорт: " + (*this->values)[ui->combBoxAirList->currentIndex()].first;
-    DialogStatistic->ui->label->setText(airportName);
+    dialogStatistic->ui->label->setText(airportName);
 
-    DialogStatistic->show();
+    dialogStatistic->show();
     airportCode = (*this->values)[ui->combBoxAirList->currentIndex()].second;
     QString request;
     request = "SELECT count(flight_no), date_trunc('month', scheduled_departure) as \"Month\""
@@ -251,23 +251,25 @@ void MainWindow::on_pushBut_Statist_clicked()
     date_for_statisticYear(yearBar->statisticInYear, yearBar->categories, dataBase->modelStatisticYearQuery);
     yearBar->buildHistogram();
 
-    DialogStatistic->ui->graphicsView_2->setChart(yearBar->chartBar);
-    DialogStatistic->ui->graphicsView_2->setRenderHint(QPainter::Antialiasing);
+    dialogStatistic->ui->graphicsView_2->setChart(yearBar->chartBar);
+    dialogStatistic->ui->graphicsView_2->setRenderHint(QPainter::Antialiasing);
 
-    DialogStatistic->ui->tabWidget->setCurrentWidget(DialogStatistic->ui->tab2);
-    DialogStatistic->ui->graphicsView_2->show();
+    dialogStatistic->ui->tabWidget->setCurrentWidget(dialogStatistic->ui->tab2);
+    dialogStatistic->ui->graphicsView_2->show();
 }
 
 void MainWindow::date_for_statisticYear(QBarSet* s, QStringList& categories, QSqlQueryModel* m){
 
+    QDate dat;
     for(int i = 0; i < m->rowCount(); i++){
         *s << m->data(m->index(i, 0)).toInt();
-        categories << m->data(m->index(i, 1)).toString();
+        dat = m->data(m->index(i, 1)).toDate();
+        categories << dat.toString("MMM yy");
     }
 }
 
 void MainWindow::sl_monthStatistic(){
-    QString month = QString::number(DialogStatistic->currentMonth +1);
+    QString month = QString::number(dialogStatistic->currentMonth +1);
     QString request;
     request = "SELECT count(flight_no), date_trunc('day', scheduled_departure) as \"Day\""
               " from bookings.flights f"
@@ -288,5 +290,5 @@ void MainWindow::sl_monthStatistic(){
         plot->x[i] = i+1;
     }
     plot->buildPlot(size);
-    DialogStatistic->ui->graphicsView->show();
+    dialogStatistic->ui->graphicsView->show();
 }
