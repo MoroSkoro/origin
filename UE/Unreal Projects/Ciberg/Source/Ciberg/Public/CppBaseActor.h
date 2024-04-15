@@ -70,10 +70,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float Frequency = 4.0f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	FVector InitialLocation;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UWorld* World;
+	/* UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UWorld* World;*/
 	
 };

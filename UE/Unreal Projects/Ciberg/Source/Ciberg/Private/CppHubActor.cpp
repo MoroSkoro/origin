@@ -30,7 +30,7 @@ void ACppHubActor::Tick(float DeltaTime)
 
 void ACppHubActor::OnTimeToSpawn() {
 	if (++CurrentTimerCount <= TotalCount) {
-		const FVector Location = GetActorLocation() + FVector(FMath::FRandRange(1400.0f, 1700.0f), FMath::FRandRange(350.0f, 1300.0f), 5.0f);
+		const FVector Location = GetActorLocation() + FVector(FMath::FRandRange(50.0f, 1000.0f), FMath::FRandRange(50.0f, 700.0f), 5.0f);
 		const FRotator Rotation = FRotator::ZeroRotator;
 		ACppBaseActor* SpawnObject = GetWorld()->SpawnActor<ACppBaseActor>(CppClass, Location, Rotation);
 		if (SpawnObject) {

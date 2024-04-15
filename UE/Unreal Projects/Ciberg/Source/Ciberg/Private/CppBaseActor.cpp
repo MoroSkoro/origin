@@ -12,8 +12,6 @@ ACppBaseActor::ACppBaseActor()
 	PrimaryActorTick.bCanEverTick = true;
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>("Mesh");
 	SetRootComponent(Mesh);
-	World = GetWorld();
-	
 }
 
 // Called when the game starts or when spawned
@@ -38,10 +36,12 @@ void ACppBaseActor::ShowActorInformation() {
 }
 
 void ACppBaseActor::SinMovement() {
-	float n = Amplitude * sin(Frequency *(World->GetTimeSeconds()));
-	FVector Location = InitialLocation;
-	Location.Z += n;
-	SetActorLocation(Location);
+	if (GetWorld())
+	{
+		FVector Location = InitialLocation;
+		Location.Z = Amplitude * sin(Frequency * (GetWorld()->GetTimeSeconds())) + InitialLocation.Z;
+		SetActorLocation(Location);
+	}
 }
 
 
