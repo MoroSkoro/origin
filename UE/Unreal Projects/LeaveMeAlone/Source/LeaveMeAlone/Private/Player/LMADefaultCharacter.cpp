@@ -23,6 +23,8 @@ ALMADefaultCharacter::ALMADefaultCharacter()
 	SpringArmComponent->bDoCollisionTest = false;
 	SpringArmComponent->bEnableCameraLag = true;
 
+	//SpringArmComponent->SetTar
+
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>("CameraComponent");
 	CameraComponent->SetupAttachment(SpringArmComponent);
 	CameraComponent->SetFieldOfView(FOV);
@@ -70,6 +72,8 @@ void ALMADefaultCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &ALMADefaultCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &ALMADefaultCharacter::MoveRight);
+	PlayerInputComponent->BindAction("CloserArmLength", IE_Pressed, this, &ALMADefaultCharacter::MoveArmLengthCloser);
+	PlayerInputComponent->BindAction("FurtherArmLength", IE_Pressed, this, &ALMADefaultCharacter::MoveArmLengthFurther);
 }
 
 void ALMADefaultCharacter::MoveForward(float Value)
@@ -79,4 +83,24 @@ void ALMADefaultCharacter::MoveForward(float Value)
 void ALMADefaultCharacter::MoveRight(float Value)
 {
 	AddMovementInput(GetActorRightVector(), Value);
+}
+
+
+void ALMADefaultCharacter::MoveArmLengthCloser()
+{
+	float ArmLengthNow = ArmLength - 25;
+	if ((ArmLengthNow >= minArmLength) && (ArmLengthNow <= maxArmLength))
+	{
+		ArmLength = ArmLengthNow;
+		SpringArmComponent->TargetArmLength = ArmLength;
+	}
+}
+void ALMADefaultCharacter::MoveArmLengthFurther()
+{
+	float ArmLengthNow = ArmLength + 25;
+	if ((ArmLengthNow >= minArmLength) && (ArmLengthNow <= maxArmLength))
+	{
+		ArmLength = ArmLengthNow;
+		SpringArmComponent->TargetArmLength = ArmLength;
+	}
 }
