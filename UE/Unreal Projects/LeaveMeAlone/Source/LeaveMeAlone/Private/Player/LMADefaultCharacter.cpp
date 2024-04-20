@@ -33,6 +33,8 @@ ALMADefaultCharacter::ALMADefaultCharacter()
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
+
+	HealthComponent = CreateDefaultSubobject<ULMAHealthComponent>("HealthComponent");
 }
 
 // Called when the game starts or when spawned
@@ -89,7 +91,7 @@ void ALMADefaultCharacter::MoveRight(float Value)
 void ALMADefaultCharacter::MoveArmLengthCloser()
 {
 	float ArmLengthNow = ArmLength - 25;
-	if ((ArmLengthNow >= minArmLength) && (ArmLengthNow <= maxArmLength))
+	if ((ArmLengthNow >= MinArmLength) && (ArmLengthNow <= MaxArmLength))
 	{
 		ArmLength = ArmLengthNow;
 		SpringArmComponent->TargetArmLength = ArmLength;
@@ -98,7 +100,7 @@ void ALMADefaultCharacter::MoveArmLengthCloser()
 void ALMADefaultCharacter::MoveArmLengthFurther()
 {
 	float ArmLengthNow = ArmLength + 25;
-	if ((ArmLengthNow >= minArmLength) && (ArmLengthNow <= maxArmLength))
+	if ((ArmLengthNow >= MinArmLength) && (ArmLengthNow <= MaxArmLength))
 	{
 		ArmLength = ArmLengthNow;
 		SpringArmComponent->TargetArmLength = ArmLength;

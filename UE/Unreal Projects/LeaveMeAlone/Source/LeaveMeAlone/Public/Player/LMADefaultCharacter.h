@@ -8,6 +8,7 @@
 
 class UCameraComponent;
 class USpringArmComponent;
+class ULMAHealthComponent;
 
 UCLASS()
 class LEAVEMEALONE_API ALMADefaultCharacter : public ACharacter
@@ -51,11 +52,14 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cursor")
 	FVector CursorSize = FVector(20.0f, 40.0f, 40.0f);
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components|Health")
+	ULMAHealthComponent* HealthComponent;
+
 public:
 	float ArmLength = 1400.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite);
-	float minArmLength = 100.0f;
+	float MinArmLength = 100.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite);
-	float maxArmLength = 2000.0f;
+	float MaxArmLength = 2000.0f;
 
 };
