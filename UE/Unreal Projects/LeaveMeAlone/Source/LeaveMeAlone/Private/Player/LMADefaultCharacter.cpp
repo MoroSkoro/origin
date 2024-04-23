@@ -8,6 +8,8 @@
 #include "Components/DecalComponent.h"
 #include "Components/InputComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+//#include "GameFramework/Character.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
 ALMADefaultCharacter::ALMADefaultCharacter()
@@ -46,6 +48,10 @@ void ALMADefaultCharacter::BeginPlay()
 	{
 		CurrentCursor = UGameplayStatics::SpawnDecalAtLocation(GetWorld(), CursorMaterial, CursorSize, FVector(0));
 	}
+
+	OnHealthChanged(HealthComponent->GetHealth());
+	HealthComponent->OnDeath.AddUObject(this, &ALMADefaultCharacter::OnDeath);
+	HealthComponent->OnHealthChanged.AddUObject(this, &ALMADefaultCharacter::OnHealthChanged);
 }
 
 // Called every frame
@@ -53,17 +59,9 @@ void ALMADefaultCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-	if (IsValid(PC))
+	if(!(HealthComponent->IsDead()))
 	{
-		FHitResult ResultHit;
-		PC->GetHitResultUnderCursor(ECC_GameTraceChannel1, true, ResultHit);
-		float FindRotatorResultYaw = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), ResultHit.Location).Yaw;
-		SetActorRotation(FQuat(FRotator(0.0f, FindRotatorResultYaw, 0.0f)));
-		if (CurrentCursor)
-		{
-			CurrentCursor->SetWorldLocation(ResultHit.Location);
-		}
+		RotationPlayerOnCursor();
 	}
 }
 
@@ -90,19 +88,51 @@ void ALMADefaultCharacter::MoveRight(float Value)
 
 void ALMADefaultCharacter::MoveArmLengthCloser()
 {
-	float ArmLengthNow = ArmLength - 25;
-	if ((ArmLengthNow >= MinArmLength) && (ArmLengthNow <= MaxArmLength))
-	{
-		ArmLength = ArmLengthNow;
-		SpringArmComponent->TargetArmLength = ArmLength;
-	}
+	ArmLength = FMath::Clamp(ArmLength - 25, MinArmLength, MaxArmLength);
+	SpringArmComponent->TargetArmLength = ArmLength;
 }
 void ALMADefaultCharacter::MoveArmLengthFurther()
 {
-	float ArmLengthNow = ArmLength + 25;
+	ArmLength = FMath::Clamp(ArmLength + 25, MinArmLength, MaxArmLength);
+	SpringArmComponent->TargetArmLength = ArmLength;
+
+	/* float ArmLengthNow = ArmLength + 25;
 	if ((ArmLengthNow >= MinArmLength) && (ArmLengthNow <= MaxArmLength))
 	{
 		ArmLength = ArmLengthNow;
 		SpringArmComponent->TargetArmLength = ArmLength;
+	}*/
+}
+
+void ALMADefaultCharacter::OnDeath()
+{
+	CurrentCursor->DestroyRenderState_Concurrent();
+	PlayAnimMontage(DeathMontage);
+	GetCharacterMovement()->DisableMovement();
+	SetLifeSpan(5.0f);
+	if (Controller)
+	{
+		Controller->ChangeState(NAME_Spectating);
 	}
+}
+
+void ALMADefaultCharacter::RotationPlayerOnCursor()
+{
+	APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+	if (PC)
+	{
+		FHitResult ResultHit;
+		PC->GetHitResultUnderCursor(ECC_GameTraceChannel1, true, ResultHit);
+		float FindRotatorResultYaw = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), ResultHit.Location).Yaw;
+		SetActorRotation(FQuat(FRotator(0.0f, FindRotatorResultYaw, 0.0f)));
+		if (CurrentCursor)
+		{
+			CurrentCursor->SetWorldLocation(ResultHit.Location);
+		}
+	}
+}
+
+void ALMADefaultCharacter::OnHealthChanged(float NewHealth)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, FString::Printf(TEXT("Health = %f"), NewHealth));
 }

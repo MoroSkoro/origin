@@ -4,11 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Components/LMAHealthComponent.h"
 #include "LMADefaultCharacter.generated.h"
 
 class UCameraComponent;
 class USpringArmComponent;
 class ULMAHealthComponent;
+class UAnimMontage;
 
 UCLASS()
 class LEAVEMEALONE_API ALMADefaultCharacter : public ACharacter
@@ -27,6 +29,10 @@ protected:
 	USpringArmComponent* SpringArmComponent;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
 	UCameraComponent* CameraComponent;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components|Health")
+	ULMAHealthComponent* HealthComponent;
+	UPROPERTY(EditDefaultsOnly, Category = "Animation")
+	UAnimMontage* DeathMontage;
 
 public:	
 	// Called every frame
@@ -43,6 +49,9 @@ private:
 	void MoveRight(float Value);
 	void MoveArmLengthCloser();
 	void MoveArmLengthFurther();
+	void OnDeath();
+	void RotationPlayerOnCursor();
+	void OnHealthChanged(float NewHealth);
 
 protected:
 	UPROPERTY()
@@ -52,14 +61,13 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cursor")
 	FVector CursorSize = FVector(20.0f, 40.0f, 40.0f);
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components|Health")
-	ULMAHealthComponent* HealthComponent;
-
 public:
 	float ArmLength = 1400.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite);
 	float MinArmLength = 100.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite);
 	float MaxArmLength = 2000.0f;
+	UFUNCTION()
+	ULMAHealthComponent* GetHealthComponent() const { return HealthComponent;}
 
 };
