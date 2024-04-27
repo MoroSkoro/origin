@@ -8,8 +8,6 @@
 #include "Components/DecalComponent.h"
 #include "Components/InputComponent.h"
 #include "Kismet/KismetMathLibrary.h"
-//#include "GameFramework/Character.h"
-#include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
 ALMADefaultCharacter::ALMADefaultCharacter()
@@ -37,6 +35,8 @@ ALMADefaultCharacter::ALMADefaultCharacter()
 	bUseControllerRotationRoll = false;
 
 	HealthComponent = CreateDefaultSubobject<ULMAHealthComponent>("HealthComponent");
+
+	GetCharacterMovement()->MaxWalkSpeed = 40.0f;
 }
 
 // Called when the game starts or when spawned
@@ -63,6 +63,8 @@ void ALMADefaultCharacter::Tick(float DeltaTime)
 	{
 		RotationPlayerOnCursor();
 	}
+
+	UpdateStamina();
 }
 
 // Called to bind functionality to input
@@ -74,6 +76,8 @@ void ALMADefaultCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 	PlayerInputComponent->BindAxis("MoveRight", this, &ALMADefaultCharacter::MoveRight);
 	PlayerInputComponent->BindAction("CloserArmLength", IE_Pressed, this, &ALMADefaultCharacter::MoveArmLengthCloser);
 	PlayerInputComponent->BindAction("FurtherArmLength", IE_Pressed, this, &ALMADefaultCharacter::MoveArmLengthFurther);
+	PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &ALMADefaultCharacter::Sprint);
+	PlayerInputComponent->BindAction("Sprint", IE_Released, this, &ALMADefaultCharacter::StopSprint);
 }
 
 void ALMADefaultCharacter::MoveForward(float Value)
@@ -85,7 +89,6 @@ void ALMADefaultCharacter::MoveRight(float Value)
 	AddMovementInput(GetActorRightVector(), Value);
 }
 
-
 void ALMADefaultCharacter::MoveArmLengthCloser()
 {
 	ArmLength = FMath::Clamp(ArmLength - 25, MinArmLength, MaxArmLength);
@@ -95,13 +98,6 @@ void ALMADefaultCharacter::MoveArmLengthFurther()
 {
 	ArmLength = FMath::Clamp(ArmLength + 25, MinArmLength, MaxArmLength);
 	SpringArmComponent->TargetArmLength = ArmLength;
-
-	/* float ArmLengthNow = ArmLength + 25;
-	if ((ArmLengthNow >= MinArmLength) && (ArmLengthNow <= MaxArmLength))
-	{
-		ArmLength = ArmLengthNow;
-		SpringArmComponent->TargetArmLength = ArmLength;
-	}*/
 }
 
 void ALMADefaultCharacter::OnDeath()
@@ -135,4 +131,53 @@ void ALMADefaultCharacter::RotationPlayerOnCursor()
 void ALMADefaultCharacter::OnHealthChanged(float NewHealth)
 {
 	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, FString::Printf(TEXT("Health = %f"), NewHealth));
+}
+
+void ALMADefaultCharacter::Sprint()
+{
+	if (HasStamina)
+	{
+		CurrentVelocity = GetCharacterMovement()->MaxWalkSpeed;
+		GetCharacterMovement()->MaxWalkSpeed = 300.0f;
+		if (GetVelocity().Size() >= 0.5)
+		{
+			IsSprint = true;
+		}
+		else
+		{
+			IsSprint = false;
+		}
+	}
+}
+
+void ALMADefaultCharacter::StopSprint()
+{
+	GetCharacterMovement()->MaxWalkSpeed = CurrentVelocity;
+	IsSprint = false;
+}
+
+void ALMADefaultCharacter::UpdateStamina()
+{
+	if (IsSprint)
+	{
+		Stamina -= StaminaDrainTime;
+		CurentRefillDelayTime = DelayBeforeRefill;
+	}
+	if (!IsSprint && (Stamina < MaxStamina))
+	{
+		CurentRefillDelayTime--;
+		if (CurentRefillDelayTime <= 0)
+		{
+			Stamina += StaminaRefillTime;
+		}
+	}
+	if (Stamina <= MinStamina)
+	{
+		HasStamina = false;
+		StopSprint();
+	}
+	else
+	{
+		HasStamina = true;
+	}
 }
