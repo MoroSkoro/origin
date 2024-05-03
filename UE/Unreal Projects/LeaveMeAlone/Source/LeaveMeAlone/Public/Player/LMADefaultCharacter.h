@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "Components/LMAHealthComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "LMAWeaponComponent.h"
 #include "LMADefaultCharacter.generated.h"
 
 class UCameraComponent;
@@ -34,6 +35,8 @@ protected:
 	ULMAHealthComponent* HealthComponent;
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 	UAnimMontage* DeathMontage;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
+	ULMAWeaponComponent* WeaponComponent;
 
 public:	
 	// Called every frame
@@ -80,7 +83,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Movement);
 	float Stamina = 100.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Movement);
-	float MinStamina = 40.0f;
+	float MinStamina = 20.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Movement);
 	float MaxStamina = 100.0f;
 	UPROPERTY();

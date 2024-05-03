@@ -36,7 +36,9 @@ ALMADefaultCharacter::ALMADefaultCharacter()
 
 	HealthComponent = CreateDefaultSubobject<ULMAHealthComponent>("HealthComponent");
 
-	GetCharacterMovement()->MaxWalkSpeed = 40.0f;
+	GetCharacterMovement()->MaxWalkSpeed = 200.0f;
+
+	WeaponComponent = CreateDefaultSubobject<ULMAWeaponComponent>("Weapon");
 }
 
 // Called when the game starts or when spawned
@@ -78,6 +80,9 @@ void ALMADefaultCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 	PlayerInputComponent->BindAction("FurtherArmLength", IE_Pressed, this, &ALMADefaultCharacter::MoveArmLengthFurther);
 	PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &ALMADefaultCharacter::Sprint);
 	PlayerInputComponent->BindAction("Sprint", IE_Released, this, &ALMADefaultCharacter::StopSprint);
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, WeaponComponent, &ULMAWeaponComponent::Fire);
+	PlayerInputComponent->BindAction("Fire", IE_Released, WeaponComponent, &ULMAWeaponComponent::StopFire);
+	PlayerInputComponent->BindAction("Reload", IE_Pressed, WeaponComponent, &ULMAWeaponComponent::Reload);
 }
 
 void ALMADefaultCharacter::MoveForward(float Value)
@@ -138,7 +143,7 @@ void ALMADefaultCharacter::Sprint()
 	if (HasStamina)
 	{
 		CurrentVelocity = GetCharacterMovement()->MaxWalkSpeed;
-		GetCharacterMovement()->MaxWalkSpeed = 300.0f;
+		GetCharacterMovement()->MaxWalkSpeed = 550.0f;
 		if (GetVelocity().Size() >= 0.5)
 		{
 			IsSprint = true;
