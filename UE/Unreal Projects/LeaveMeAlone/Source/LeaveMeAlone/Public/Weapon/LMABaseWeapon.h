@@ -62,6 +62,7 @@ public:
 	FOutOfBulletsDelegat OutOfBulletsDelegat;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	bool BaseAnimReloading = true;
+	FAmmoWeapon GetCurrentAmmoWeapon() const { return CurrentAmmoWeapon; }
 
 private:
 	FTimerHandle WeaponShootTimer;

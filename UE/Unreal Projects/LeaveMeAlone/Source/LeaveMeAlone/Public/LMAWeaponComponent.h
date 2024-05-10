@@ -36,6 +36,7 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	void Fire();
+	UFUNCTION(BlueprintCallable)
 	void StopFire();
 
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
@@ -46,4 +47,6 @@ public:
 	void OnNotifyReloadFinished(USkeletalMeshComponent* SkeletalMesh);
 	bool CanReload() const;
 	void ReloadIfHavNotBullets();
+	UFUNCTION(BlueprintCallable)
+	bool GetCurrentWeaponAmmo(FAmmoWeapon& AmmoWeapon) const;
 };
