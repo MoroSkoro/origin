@@ -4,20 +4,26 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+
+
 #include "LMAPlayerController.generated.h"
 
-/**
- * 
- */
+
 UCLASS()
 class LEAVEMEALONE_API ALMAPlayerController : public APlayerController
 {
 	GENERATED_BODY()
 	
 public:
-	ALMAPlayerController();
+	ALMAPlayerController(); // FObjectInitializer& ObjectInitializer);
+
+private:
+	//TSubclassOf<class UUserWidget> DeathMenuWidgetClass;
 
 protected:
 	virtual void BeginPlay() override;
 	virtual void BeginSpectatingState() override;
+
+public:
+	virtual void Init();
 };

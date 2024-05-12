@@ -44,6 +44,8 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	UFUNCTION(BlueprintCallable)
+	void OnHealthChanged(float NewHealth);
 
 private:
 	float YRotation = -75.0f;
@@ -55,7 +57,6 @@ private:
 	void MoveArmLengthFurther();
 	void OnDeath();
 	void RotationPlayerOnCursor();
-	void OnHealthChanged(float NewHealth);
 	void Sprint();
 	void StopSprint();
 
