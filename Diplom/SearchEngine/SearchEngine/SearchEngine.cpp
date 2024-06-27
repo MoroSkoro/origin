@@ -18,9 +18,9 @@
 #include <map>
 #include <sstream>
 
-//#include <pqxx/pqxx>
-//#include <pqxx/connection>
-//#include <pqxx/transaction>
+#include <pqxx/pqxx>
+#include <pqxx/connection>
+#include <pqxx/transaction>
 
 //#pragma setlocale( "Russian" )
 
@@ -167,23 +167,20 @@ int main()
     std::string p;
     std::map<std::string, int> m;
 
-    std::string BD_host = "fjhjdhj";
+    std::string BD_host;
     std::string BD_port;
-    std::string BD_name = "jofkhifyg";
-    std::string BD_user = "hfgyddt";
-    std::string BD_parole = "jgfgddd";
+    std::string BD_name;
+    std::string BD_user;
+    std::string BD_parole;
     std::string html_start = "https://wikipedia.org/"; //"https://ru.wikipedia.org/wiki/";
     std::string html_start1 = "file:///E:/HTML/Simple.html";
     std::string s;
     size_t pars_recurs = 3;
     size_t http_port = 80;
+    std::string er{"Error"};
     
     try
     {
-     
-        
-        
-       
 
         std::ifstream ini("SearchEngine.ini");
         std::ofstream fout("output.txt");
@@ -203,10 +200,10 @@ int main()
             http_port = stoi(s);
         }
         else {
-            std::cout << "Failed to read file SearchEngine.ini" << std::endl;
-            return -1;
+            er = "Failed to read file SearchEngine.ini";
+            throw er;
         }
-        ini.close();     // ��������� ����
+        ini.close();
 
         if (fout.is_open())
         {
@@ -217,12 +214,11 @@ int main()
             fout << BD_parole << std::endl;
             fout << html_start << std::endl;
             fout << pars_recurs << std::endl;
-            fout << http_port << std::endl;
-           
+            fout << http_port << std::endl;  
         }
         else {
-            std::cout << "Failed to write file output.txt" << std::endl;
-            return -1;
+            er = "Failed to write file output.txt";
+            throw er;
         }
         fout.close();
 
@@ -240,7 +236,7 @@ int main()
         else*/
         if (response.status_code >= 400) {
             //std::cerr << "Error [" << r.status_code << "] making request" << std::endl;
-            std::string er = "Error [";
+            er = "Error [";
             er += response.status_code;
             er += "] making request";
             throw er;
@@ -298,24 +294,22 @@ int main()
 
         //doc1 = doc;// htmlParseFile(response.text.c_str(), "UTF - 8"); //xmlParseFile(response.text.c_str());
         if (doc == NULL) {
-            fprintf(stderr, "Document not parsed successfully.\n");
-            return 1;
+            er = "Document not parsed successfully.\n";
+            throw er;
+            //fprintf(stderr, "Document not parsed successfully.\n");
+            //return 1;
         }
 
         cur = xmlDocGetRootElement(doc);
 
         if (cur == NULL) {
+            er = "empty document\n";
+            throw er;
             fprintf(stderr, "empty document\n");
-            //xmlFreeDoc(doc1);
             return 1;
         }
 
-        /*if (xmlStrcmp(cur->name, (const xmlChar*)"story")) {
-            fprintf(stderr, "document of the wrong type, root node != story");
-            xmlFreeDoc(doc1);
-            return;
-        }*/
-        //xmlChar* v;
+        
         cur = cur->xmlChildrenNode;
             while (cur != NULL) {
                 //if ((!xmlStrcmp(cur->name, (const xmlChar*)"storyinfo"))) {
@@ -350,17 +344,65 @@ int main()
         // free up the file resources
         csv_file.close();
 
+        std::string conect = "host=" + BD_host + " " + "port=" + BD_port + " " + "dbname=" + BD_name + " " + "user=" + BD_user + " " + "password=" + BD_parole;
 
-        // Gracefully close the socket
-        //beast::error_code ec;
+        pqxx::connection c(conect);
+        if (c.is_open()) {
+            std::cout << "Opened database successfully: " << c.dbname() << std::endl;
+        }
+        else {
+            er = "Can't open database\n";
+            throw er;
+        }
+        pqxx::work xact(c);
+        xact.exec("CREATE TABLE IF NOT EXISTS Pages "
+            "(id SERIAL PRIMARY KEY, "
+            "Links TEXT UNIQUE)");
+        /*"Ссылки VARCHAR(60) NOT NULL DEFAULT 'htpp', "
+        "Lastname TEXT NOT NULL DEFAULT 'Voevoda', "
+        "Email TEXT UNIQUE)");  //как здесь реалтзовать защиту от SQL инъекций?*/
+        xact.exec("CREATE TABLE IF NOT EXISTS Words "
+            "(id SERIAL PRIMARY KEY, "
+            "Word TEXT UNIQUE)");
+        xact.exec("CREATE TABLE IF NOT EXISTS Word_frequency "
+            "(id SERIAL PRIMARY KEY, "
+            "Pages_id INTEGER NOT NULL REFERENCES Pages, "
+            "Words_id   INTEGER NOT NULL REFERENCES Words, "
+            "Count INTEGER, "
+            "UNIQUE(Pages_id, Words_id));");
+
+    
+        xact.exec("INSERT INTO Pages(Links) "
+            "VALUES('" + html_start + "');");
+        xact.commit();
+
+        //ShellExecute(0, 0, L"http://www.google.com", 0, 0, SW_SHOWNORMAL);//SW_SHOW);
+        std::cout << "ALL TEXT: " << all_text << std::endl;
+        std::cout << std::endl;
+        std::cout << std::endl;
+        int min = 1;
+        int max = 33;
+
+        //std::string res;
+        //std::string  res(const wchar_t* s);
+        //std::cout << "WANT TEXT: " << removeParser(toUTF16(all_text), min, max) << std::endl;
+
+        //std::cout << "WANT TEXT: " << removeParser(ToLower(all_text), min, max) << std::endl;
+
+
+        std::stringstream words(removeParser(ToLower(all_text), min, max));
+        while (words >> p)
+        {
+            m[p]++;
+        }
+
+        for (auto e : m)
+        {
+            std::cout << e.first << " --> " << e.second << "\n";
+        }
+
         
-        // not_connected happens sometimes
-        // so don't bother reporting it.
-        //
-        //if (0);// (ec && ec != beast::errc::not_connected)
-            //throw beast::system_error{ ec };
 
-        // If we get here then the connection is closed gracefully
     }
     catch (std::exception const& e)
     {
@@ -372,71 +414,7 @@ int main()
         std::cout << error_message << std::endl;
     }
     
-    //ShellExecute(0, 0, L"http://www.google.com", 0, 0, SW_SHOWNORMAL);//SW_SHOW);
-    std::cout << "ALL TEXT: " << all_text << std::endl;
-    std::cout << std::endl;
-    std::cout << std::endl;
-    int min = 1;
-    int max = 33;
-
-    //std::string res;
-    //std::string  res(const wchar_t* s);
-    std::cout << "WANT TEXT: " << removeParser(toUTF16(all_text), min, max) << std::endl;
     
-    //std::cout << res << std::endl;
-    
-    //std::cout << wordsPars(ToLower(all_text), min, max) << std::endl;
-    //std::string hello = "Много           Андрей!,,!!... ";
-    /*std::string hello = "Hello World!!!";
-    std::cout << "Привет           Андрей!,,!!... " << std::endl;
-    size_t pos = hello.find("т");
-    std::cout << "Найден Андрей с позиции " << hello.find('o') << std::endl;*/
-    std::cout << "WANT TEXT: " << removeParser(ToLower(all_text), min, max) << std::endl;
-
-
-    std::stringstream words(removeParser(ToLower(all_text), min, max));
-    while (words >> p)
-    {
-        m[p]++;
-    }
-
-    for (auto e : m)
-    {
-        std::cout << e.first << " --> " << e.second << "\n";
-    }
-
-    std::string conect = "host=" +  BD_host +" "+ "port=" + BD_port +" "+ "dbname=" + BD_name +" "+ "user=" + BD_user +" "+ "password=" + BD_parole;
-   
-    /*try
-    {
-        std::unique_ptr<pqxx::connection> ptr_c;
-        auto c = std::make_unique<pqxx::connection>(
-            "host=localhost " // 127.0.0.1
-            "port=5432 "
-            "dbname=database_spider "
-            "user=postgres "
-            "password=Iougurt13");
-        auto c = std::make_unique<pqxx::connection>(conect);
-        pqxx::connection c(conect);
-        if (c->is_open()) {
-            std::cout << "Opened database successfully: " << c->dbname() << std::endl;
-        }
-        else {
-            std::cout << "Can't open database" << std::endl;
-            return 1;
-        }
-       
-        //c->disconnect();
-        //pqxx::work w(c);
-        
-    }
-    catch (pqxx::sql_error e)//(std::exception const& e)
-    {
-        std::cerr << e.what() << std::endl;
-        //return 1;
-    }*/
-
-    std::cout << conect;
 
     std::getchar();
     return 0;// EXIT_SUCCESS;

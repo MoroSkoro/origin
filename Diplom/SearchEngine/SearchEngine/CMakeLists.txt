@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.18)
+cmake_minimum_required(VERSION 3.20)
 
 project(
     SearchEngine
@@ -10,12 +10,28 @@ if(NOT "${CMAKE_CXX_STANDARD}")
     set(CMAKE_CXX_STANDARD 20)
 endif()
 
-#target_compile_features(Test_libpqxx16 PRIVATE cxx_std_20)
+INCLUDE_DIRECTORIES(
+ #E:/dev/vcpkg/installed/x64-windows/include
+ Resurs/include
+)
 
-#add_subdirectory(F:\\libpqxx-7.7.5 libpqxx-build)
+LINK_DIRECTORIES(
+   #E:/dev/vcpkg/installed/x64-windows/lib
+   Resurs/lib
+)
+
 
 add_executable(SearchEngine SearchEngine.cpp)
+target_compile_features(SearchEngine PRIVATE cxx_std_20)
 
-add_subdirectory(libpqxx Build16)
-target_link_libraries(SearchEngine pqxx)
+add_subdirectory(Resurs/libpqxx Build16)
+target_link_libraries(SearchEngine PRIVATE pqxx)
+
+find_package(cpr CONFIG REQUIRED)
+target_link_libraries(SearchEngine PRIVATE cpr::cpr)
+
+find_package(LibXml2 REQUIRED)
+target_link_libraries(SearchEngine PRIVATE LibXml2::LibXml2)
+
+
 
