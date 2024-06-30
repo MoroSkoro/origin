@@ -21,8 +21,11 @@ LINK_DIRECTORIES(
 )
 
 
-add_executable(SearchEngine SearchEngine.cpp)
+
+add_executable(SearchEngine SearchEngine.cpp  "Resurs/include/sch_engine/processing_functions.h" "Resurs/src/sch_engine/processing_functions.cpp")
 target_compile_features(SearchEngine PRIVATE cxx_std_20)
+
+target_include_directories(SearchEngine PUBLIC Resurs/include/sch_engine/ Resurs/src/sch_engine/)
 
 add_subdirectory(Resurs/libpqxx Build16)
 target_link_libraries(SearchEngine PRIVATE pqxx)
