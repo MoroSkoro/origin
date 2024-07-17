@@ -19,3 +19,5 @@ std::string removeParser(std::wstring a, int& const min, int& const max);
 
 void parseStory(xmlDocPtr doc, xmlNodePtr cur, std::string&);
 std::string wordsPars(std::wstring a, int& const min, int& const max);
+
+bool func_pars(std::string& link, std::vector<std::string>& discov, std::vector<std::string>& buffer_links, std::string& all_text);
