@@ -10,8 +10,8 @@
 #include <locale>
 
 #include "cpr/cpr.h"
-#include "libxml/HTMLparser.h"
-#include "libxml/xpath.h"
+//#include "libxml/htmlparser.h"
+//#include "libxml/xpath.h"
 
 #include <vector>
 #include <ranges>
@@ -27,7 +27,7 @@
 #include "ShellAPI.h"
 #include <windows.h>
 
-#include <curl/curl.h>
+//#include <curl/curl.h>
 
 
 
@@ -66,8 +66,8 @@ int main()
     int min = 3;
     int max = 33;
     
-    try
-    {
+    /*try
+    {*/
 
         std::ifstream ini("SearchEngine.ini");
         std::ofstream fout("output.txt");
@@ -140,79 +140,97 @@ int main()
         int f = 0;
         while (!links_to_scrape.empty() && (current_recurs < pars_recurs)) {
             // define the user agent for the GET request
-            
+
             std::string link{};
             link = links_to_scrape.at(0);
             links_to_scrape.erase(links_to_scrape.begin());
             if (current_recurs == 0) { std::cout << "Pleas wait..." << std::endl; }
             //func
             std::cout << "while = " << f << std::endl;
-            if(func_pars(link, discovered_links, buffer_links, all_text)){
-                std::cout << "pars_ok = true" << std::endl;
-                std::cout << "while = " << f << std::endl;
-                if (all_text[0] != '0') {
-                    pqxx::work xact1(c);
-                                //std::cout << "Текущая ссылка: " << link << std::endl;
-                    auto r = xact1.exec("INSERT INTO Pages(Links) "
-                        "VALUES('" + xact1.esc(link) + "') on conflict (Links) do nothing RETURNING id;");
-                    if (r.empty()) { r = xact1.exec("SELECT id FROM Pages WHERE Links = '" + xact1.esc(link) + "';"); }
-                                //pqxx::result::const_iterator ptr = r.begin();
-                    std::string pages_id_str = (r[0][0].as<std::string>());
-                    xact1.commit();
 
-                    std::stringstream words(removeParser(ToLower(all_text), min, max));
-                    pqxx::work xact2(c);
-                    while (words >> p) {
-                        m[p]++;
-                    }
-                    for (auto e : m) {
-                        r = xact2.exec("INSERT INTO Words(Word) "
-                            "VALUES('" + xact2.esc(e.first) + "') on conflict (Word) do nothing RETURNING id;");
-                        if (r.empty()) { r = xact2.exec("SELECT id FROM Words WHERE Word = '" + xact2.esc(e.first) + "';"); }
-                        std::string words_id_str = (r[0][0].as<std::string>());
-                        std::string preobraz{ std::to_string(e.second) };
-                        xact2.exec("INSERT INTO Word_frequency(Pages_id, Words_id, Count) "
-                            "VALUES(" + xact2.esc(pages_id_str) + ", " + xact2.esc(words_id_str) + ", " + xact2.esc(preobraz) + ") on conflict (Pages_id, Words_id) do nothing;");
-                                    //std::cout << e.first << " --> " << e.second << "\n";
-                    }
-                    xact2.commit();
-                }
-                    //discovered_links.push_back(link);
+
+            const cpr::Header headers = { {"User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36"} };
+            link = "https://play.google.com/store/apps/details?id=org.wikipedia&referrer=utm_source%3Dportal%26utm_medium%3Dbutton%26anid%3Dadmob";
+
+            const cpr::Response r = cpr::Get(cpr::Url{ link }, headers);
+            std::cout << "Status code: " << r.status_code << '\n';
+            std::cout << "Header:\n";
+            for (const std::pair<const std::basic_string<char>, std::basic_string<char>>& kv : r.header) {
+                std::cout << '\t' << kv.first << ':' << kv.second << '\n';
             }
-            discovered_links.push_back(link);
-            if (current_recurs <= pars_recurs) {
-                
-                if (links_to_scrape.empty()) {
-                    //if (!buffer_links.empty()) {
-                    std::cout << "pars_ok = false" << std::endl;
-                        links_to_scrape = buffer_links;
-                        buffer_links.clear();
-                    //}
-                    ++current_recurs;
-                }
-            }
-            std::cout << "while = true" << std::endl; f++;
+            std::cout << "Text: " << r.text << '\n';
+           
         }
-        std::cout << "while = false" << std::endl;
+
+
+            /* if (func_pars(link, discovered_links, buffer_links, all_text)) {
+                 std::cout << "pars_ok = true" << std::endl;
+                 std::cout << "while = " << f << std::endl;
+                 if (all_text[0] != '0') {
+                     pqxx::work xact1(c);
+                                 //std::cout << "Текущая ссылка: " << link << std::endl;
+                     auto r = xact1.exec("INSERT INTO Pages(Links) "
+                         "VALUES('" + xact1.esc(link) + "') on conflict (Links) do nothing RETURNING id;");
+                     if (r.empty()) { r = xact1.exec("SELECT id FROM Pages WHERE Links = '" + xact1.esc(link) + "';"); }
+                                 //pqxx::result::const_iterator ptr = r.begin();
+                     std::string pages_id_str = (r[0][0].as<std::string>());
+                     xact1.commit();
+
+                     std::stringstream words(removeParser(ToLower(all_text), min, max));
+                     pqxx::work xact2(c);
+                     while (words >> p) {
+                         m[p]++;
+                     }
+                     for (auto e : m) {
+                         r = xact2.exec("INSERT INTO Words(Word) "
+                             "VALUES('" + xact2.esc(e.first) + "') on conflict (Word) do nothing RETURNING id;");
+                         if (r.empty()) { r = xact2.exec("SELECT id FROM Words WHERE Word = '" + xact2.esc(e.first) + "';"); }
+                         std::string words_id_str = (r[0][0].as<std::string>());
+                         std::string preobraz{ std::to_string(e.second) };
+                         xact2.exec("INSERT INTO Word_frequency(Pages_id, Words_id, Count) "
+                             "VALUES(" + xact2.esc(pages_id_str) + ", " + xact2.esc(words_id_str) + ", " + xact2.esc(preobraz) + ") on conflict (Pages_id, Words_id) do nothing;");
+                                     //std::cout << e.first << " --> " << e.second << "\n";
+                     }
+                     xact2.commit();
+                 }
+                     //discovered_links.push_back(link);
+             }
+             discovered_links.push_back(link);
+             if (current_recurs <= pars_recurs) {
+
+                 if (links_to_scrape.empty()) {
+                     //if (!buffer_links.empty()) {
+                     std::cout << "pars_ok = false" << std::endl;
+                         links_to_scrape = buffer_links;
+                         buffer_links.clear();
+                     //}
+                     ++current_recurs;
+                 }
+             }
+             std::cout << "while = true" << std::endl; f++;
+         }
+         std::cout << "while = false" << std::endl;
+         c.close();
+     }
+     catch (std::exception & e)
+     {
+         std::cerr << "Error: " << e.what() << std::endl;
+         std::cout << "pars_ok = exseption" << std::endl;
+         return 0;// EXIT_FAILURE;
+     }
+     catch (std::string error_message)
+     {
+         std::cout << error_message << std::endl;
+     }
+
+    // auto response = cpr::Get(cpr::Url{ " " });
+     //std::cerr << "Ошибка запроса -> " << response.error.message << std::endl;
+     //response.~Response();
+     //if (&response != nullptr) std::cout << "response = nullptr" << std::endl; //*/
+
         c.close();
-    }
-    catch (std::exception & e)
-    {
-        std::cerr << "Error: " << e.what() << std::endl;
-        std::cout << "pars_ok = exseption" << std::endl;
-        return 0;// EXIT_FAILURE;
-    }
-    catch (std::string error_message)
-    {
-        std::cout << error_message << std::endl;
-    }
-
-   // auto response = cpr::Get(cpr::Url{ " " });
-    //std::cerr << "Ошибка запроса -> " << response.error.message << std::endl;
-    //response.~Response();
-    //if (&response != nullptr) std::cout << "response = nullptr" << std::endl; //
-
-    std::cout << "Конец программы!" << std::endl;
-    std::getchar();
-    return 0;// EXIT_SUCCESS;
+            std::cout << "Конец программы!" << std::endl;
+            std::getchar();
+            return 0;// EXIT_SUCCESS;
+        
 }

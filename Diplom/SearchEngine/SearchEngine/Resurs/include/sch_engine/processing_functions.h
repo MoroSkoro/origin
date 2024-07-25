@@ -4,10 +4,12 @@
 #include <string>
 #include <windows.h>
 #include <filesystem>
-#include "cpr/cpr.h"
+#include <sstream>
+
+/*#include "cpr/cpr.h"
 #include "libxml/HTMLparser.h"
 #include "libxml/xpath.h"
-#include <sstream>
+
 
 //UTF8 -> UTF16 conversion
 std::wstring toUTF16(const std::string& input);
@@ -20,4 +22,4 @@ std::string removeParser(std::wstring a, int& const min, int& const max);
 void parseStory(xmlDocPtr doc, xmlNodePtr cur, std::string&);
 std::string wordsPars(std::wstring a, int& const min, int& const max);
 
-bool func_pars(std::string& link, std::vector<std::string>& discov, std::vector<std::string>& buffer_links, std::string& all_text);
+bool func_pars(std::string& link, std::vector<std::string>& discov, std::vector<std::string>& buffer_links, std::string& all_text);*/
