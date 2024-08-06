@@ -26,22 +26,19 @@ if (${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 endif()
 include(FetchContent)
-#FetchContent_Declare(cpr GIT_REPOSITORY https://github.com/libcpr/cpr.git)
 FetchContent_Declare(cpr SOURCE_DIR "${CMAKE_SOURCE_DIR}/Resurs/cpr/")
-                         #GIT_TAG 3b15fa82ea74739b574d705fea44959b58142eb8) # Replace with your desired git commit from: https://github.com/libcpr/cpr/releases
+#FetchContent_Declare(cpr GIT_REPOSITORY https://github.com/libcpr/cpr.git
+    #GIT_TAG 1.10.5)
 FetchContent_MakeAvailable(cpr)
 
-#FetchContent_Declare(pqxx GIT_REPOSITORY https://github.com/jtv/libpqxx.git)
 FetchContent_Declare(pqxx SOURCE_DIR "${CMAKE_SOURCE_DIR}/Resurs/libpqxx/")
 FetchContent_MakeAvailable(pqxx)
-#FetchContent_Declare(libxml GIT_REPOSITORY https://github.com/GNOME/libxml2.git)
-#FetchContent_Declare(libxml SOURCE_DIR "${CMAKE_SOURCE_DIR}/Resurs/libxml2/")
-#FetchContent_MakeAvailable(libxml)
 
 target_link_libraries(SearchEngine PRIVATE cpr::cpr)
 target_link_libraries(SearchEngine PRIVATE pqxx)
-#target_link_libraries(SearchEngine PRIVATE ${CMAKE_SOURCE_DIR}/Resurs/lib/cpr/cpr.dll)
-target_link_directories(SearchEngine PUBLIC ${CMAKE_SOURCE_DIR}/Resurs/libxml2/lib/)
-target_link_libraries(SearchEngine PRIVATE libxml2d) #libxml2sd
-target_include_directories(SearchEngine PUBLIC ${CMAKE_SOURCE_DIR}/Resurs/libxml2/include/libxml2/)
+target_link_directories(SearchEngine PUBLIC ${CMAKE_SOURCE_DIR}/Resurs/libxml2/lib/
+     ${CMAKE_SOURCE_DIR}/Resurs/iconv/lib/)
+target_link_libraries(SearchEngine PRIVATE libxml2 iconv) #libxml2d
+target_include_directories(SearchEngine PUBLIC ${CMAKE_SOURCE_DIR}/Resurs/libxml2/include/
+     ${CMAKE_SOURCE_DIR}/Resurs/iconv/include/)
 

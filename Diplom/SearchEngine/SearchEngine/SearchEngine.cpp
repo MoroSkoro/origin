@@ -1,38 +1,29 @@
-﻿/*#include <boost/beast/core.hpp>
-#include <boost/beast/http.hpp>
-#include <boost/beast/version.hpp>
-#include <boost/asio/connect.hpp>
-#include <boost/asio/ip/tcp.hpp>*/
+﻿
 #include <cstdlib>
 #include <iostream>
 #include <string>
 #include <fstream>
 #include <locale>
+#include <vector>
+#include <ranges>
+#include <map>
+#include <sstream>
+#include <thread>
 
 #include "cpr/cpr.h"
 #include "libxml/htmlparser.h"
 #include "libxml/xpath.h"
 
-#include <vector>
-#include <ranges>
-#include <map>
-#include <sstream>
-
 #include <pqxx/pqxx>
 #include <pqxx/connection>
 #include <pqxx/transaction>
-#include <thread>
 
-//#include "Resurs/include/sch_engine/processing_functions.h"
+#include "Resurs/include/sch_engine/processing_functions.h"
 
 #include "ShellAPI.h"
 #include <windows.h>
 
 //#include <curl/curl.h>
-
-
-
-
 int main()
 {
     SetConsoleCP(65001);
@@ -48,21 +39,30 @@ int main()
     std::string BD_user;
     std::string BD_parole;
     std::string html_start = "https://wikipedia.org/"; //"https://ru.wikipedia.org/wiki/";
-    std::string html_start1 = "file:///E:/HTML/Simple.html"; //"https://wikipedia.org"; //"https://www.google.com";//  https://meta.wikimedia.org/wiki/Special:MyLanguage/List_of_Wikipedias";
+    std::string html_start1 = "https://www.google.com";//"file:///E:/HTML/Simple.html"; //"https://wikipedia.org"; //"https://www.google.com";//  https://meta.wikimedia.org/wiki/Special:MyLanguage/List_of_Wikipedias";
     std::string s;
     size_t pars_recurs = 1;
     size_t http_port = 80;
     std::string er{"Error"};
     int id;
+    unsigned short rep = 2000;
     std::string id_str;
-    std::vector<std::string> links_to_scrape{};
-    std::vector<std::string> discovered_links{};
-    std::vector<std::string> buffer_links{};
+    std::vector<std::string> links_to_scrape;
+    links_to_scrape.reserve(rep);
+    std::vector<std::string> discovered_links;
+    discovered_links.reserve(rep);
+    std::vector<std::string> buffer_links;
+    buffer_links.reserve(rep);
+    std::vector<std::string> buffer_links_for_all;
+    buffer_links_for_all.reserve(rep);
+    std::vector<std::string> del_already_verified;
+    del_already_verified.reserve(rep);
     size_t current_recurs = 0;
     std::string all_text;
     int min = 3;
     int max = 33;
-    
+    if (links_to_scrape.empty()) std::cout << "Вектора пустые!" << std::endl;
+    else std::cout << "Вектора NONпустые!" << std::endl;
     try
     {
 
@@ -82,30 +82,13 @@ int main()
             pars_recurs = stoi(s);
             std::getline(ini, s);
             http_port = stoi(s);
-            std::cout << pars_recurs << std::endl;
+            std::cout << "Pars - " << pars_recurs << std::endl;
         }
         else {
             er = "Failed to read file SearchEngine.ini";
             throw er;
         }
         ini.close();
-
-        if (fout.is_open())
-        {
-            fout << BD_host << std::endl;
-            fout << BD_port << std::endl;
-            fout << BD_name << std::endl;
-            fout << BD_user << std::endl;
-            fout << BD_parole << std::endl;
-            fout << html_start << std::endl;
-            fout << pars_recurs << std::endl;
-            fout << http_port << std::endl;
-        }
-        else {
-            er = "Failed to write file output.txt";
-            throw er;
-        }
-        fout.close();
 
         std::string conect = "host=" + BD_host + " " + "port=" + BD_port + " " + "dbname=" + BD_name + " " + "user=" + BD_user + " " + "password=" + BD_parole;
 
@@ -133,7 +116,8 @@ int main()
         xact.commit();
 
         bool do_not_execute = false;
-        links_to_scrape.push_back(html_start);
+        //links_to_scrape.push_back(html_start1);
+        links_to_scrape.emplace_back(html_start);
         int f = 0;
         while (!links_to_scrape.empty() && (current_recurs < pars_recurs)) {
             // define the user agent for the GET request
@@ -143,63 +127,26 @@ int main()
             links_to_scrape.erase(links_to_scrape.begin());
             if (current_recurs == 0) { std::cout << "Pleas wait..." << std::endl; }
             //func
-            std::cout << "while = " << f << std::endl;
+            std::cout << "111while = " << f << std::endl; f++;
 
-
-            const cpr::Header headers = { {"User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36"} };
             //link = "https://play.google.com/store/apps/details?id=org.wikipedia&referrer=utm_source%3Dportal%26utm_medium%3Dbutton%26anid%3Dadmob";
+            //std::string hh = "https://itunes.apple.com/app/apple-store/id324715238?pt=208305&ct=portal&mt=8";
+            //std::string hh = "http://apps.apple.com/us/app/wikipedia/id324715238";
+            /*std::string hh = "http://apps.apple.com/us/app/wikipedia/id324715238";
+            cpr::Response r = cpr::Get(cpr::Url{ hh });
+            std::cout << "Text = " << r.text << std::endl;
+            std::cout << "CPR cod = " << r.status_code << std::endl;
+            if (r.status_code == 0) {
+                auto error = r.error.code;
+                std::cout << "Error cod: " << r.error.message << std::endl;
+            }*/
 
-            const cpr::Response r = cpr::Get(cpr::Url{ link }, headers);
-            std::cout << "Status code: " << r.status_code << '\n';
-            std::cout << "Header:\n";
-            for (const std::pair<const std::basic_string<char>, std::basic_string<char>>& kv : r.header) {
-                std::cout << '\t' << kv.first << ':' << kv.second << '\n';
-            }
-            std::cout << "Text: " << r.text << '\n';
-            htmlDocPtr doc;
-            xmlXPathContextPtr context;
-           doc = htmlReadMemory(r.text.c_str(), r.text.length(), nullptr, "utf-8", HTML_PARSE_NOWARNING | HTML_PARSE_NOERROR);
-            if (doc == NULL) {
-                er = "Document not parsed successfully.\n";
-                std::cout << er << std::endl;
-                throw er;
-            }
-
-            context = xmlXPathNewContext(doc);
-            if (context) {
-                xmlXPathObjectPtr all_links = xmlXPathEvalExpression((xmlChar*)"//a", context);
-                std::string url{ 1 };
-                // iterate over the list of industry card elements
-                if (all_links && all_links->nodesetval) {
-                    for (int i = 0; i < all_links->nodesetval->nodeNr; i++) {
-                        xmlNodePtr url_html_link = all_links->nodesetval->nodeTab[i];
-                        xmlXPathSetContextNode(url_html_link, context);
-                        if (reinterpret_cast<char*>(xmlGetProp(url_html_link, (xmlChar*)"href"))) {
-                            url = std::string(reinterpret_cast<char*>(xmlGetProp(url_html_link, (xmlChar*)"href")));
-                        }
-                        if ((std::find(discovered_links.begin(), discovered_links.end(), url) == discovered_links.end()) && (url != link)) {
-                            if ((url.starts_with("http")) && (&url != nullptr)) {
-                                buffer_links.push_back(url);
-                                //std::cout << url << std::endl;
-                            }
-                        }
-                    }
-                }
-                //parseHTML(context, all_text);
-                xmlXPathFreeObject(all_links);
-            }
-            else {
-                discovered_links.push_back(link);
-                //pars_ok = false;
-            }
-            xmlXPathFreeContext(context);
-            xmlFreeDoc(doc);
-
-            /*тут1
-                if (func_pars(link, discovered_links, buffer_links, all_text)) {
-                     std::cout << "pars_ok = true" << std::endl;
-                     std::cout << "while = " << f << std::endl;
-                     if (all_text[0] != '0') {
+            //if (link.empty()) { std::cout << "link EMPTY" << std::endl; }
+            //std::cout << link << std::endl;
+                if (func_pars(link, buffer_links, all_text)) {
+                     
+                     //if (all_text[0] != '0') {
+                     if (!all_text.empty()) {
                          pqxx::work xact1(c);
                                      //std::cout << "Текущая ссылка: " << link << std::endl;
                          auto r = xact1.exec("INSERT INTO Pages(Links) "
@@ -208,8 +155,10 @@ int main()
                                      //pqxx::result::const_iterator ptr = r.begin();
                          std::string pages_id_str = (r[0][0].as<std::string>());
                          xact1.commit();
-
-                         std::stringstream words(removeParser(ToLower(all_text), min, max));
+                         
+                         std::wstring low = ToLower(all_text);
+                         std::stringstream words(removeParser(low, min, max));
+                         //std::stringstream words(removeParser(ToLower(all_text), min, max));
                          pqxx::work xact2(c);
                          while (words >> p) {
                              m[p]++;
@@ -227,25 +176,39 @@ int main()
                          xact2.commit();
                      }
                          //discovered_links.push_back(link);
+                }
+                 discovered_links.emplace_back(link);
+                 if (current_recurs < (pars_recurs - 1)) {
+                     
+                     for (auto stroc : buffer_links) {
+                         if ((std::find(discovered_links.begin(), discovered_links.end(), stroc) == discovered_links.end())) {
+                             if (stroc.starts_with("http")) {
+                                 del_already_verified.emplace_back(stroc);
+                                 //std::cout << url << std::endl;
+                             }
+                         }
+                     }
+                     buffer_links.clear();
+                     buffer_links_for_all.insert(buffer_links_for_all.end(), del_already_verified.begin(), del_already_verified.end());
                  }
-                 discovered_links.push_back(link);
                  if (current_recurs <= pars_recurs) {
-
                      if (links_to_scrape.empty()) {
-                         //if (!buffer_links.empty()) {
-                         std::cout << "pars_ok = false" << std::endl;
-                             links_to_scrape = buffer_links;
-                             buffer_links.clear();
-                         //}
                          ++current_recurs;
+                         if (!buffer_links_for_all.empty()) {
+                         std::cout << "links_to_scrape = buffer_links_for_all;" << std::endl;
+                         std::cout << "Size buffer_links_for_all - " << buffer_links_for_all.size() << std::endl;
+                             links_to_scrape = buffer_links_for_all;
+                             buffer_links_for_all.clear();
+                         }
+                         
                      }
                  }
-                 std::cout << "while = true" << std::endl; f++;
-            }
-             std::cout << "while = false" << std::endl;
-             c.close();*/ //тут1
+                 std::cout << "while = true" << std::endl;
+                 if (f > rep/20) break;
         }
+             c.close();
     }
+    
      catch (std::exception & e)
      {
          std::cerr << "Error: " << e.what() << std::endl;
@@ -262,7 +225,7 @@ int main()
      //response.~Response();
      //if (&response != nullptr) std::cout << "response = nullptr" << std::endl; //*/
 
-            std::cout << "Конец программы!" << std::endl;
+            std::cout << "Конец программы zzz!" << std::endl;
             std::getchar();
             return 0;// EXIT_SUCCESS;
         
