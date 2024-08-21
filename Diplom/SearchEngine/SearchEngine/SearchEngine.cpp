@@ -19,19 +19,23 @@
 #include <pqxx/transaction>
 
 #include "Resurs/include/sch_engine/processing_functions.h"
+#include "Resurs/include/BS_thread_pool.hpp"
+#include <future>
 
 #include "ShellAPI.h"
 #include <windows.h>
 
-//#include <curl/curl.h>
+BS::thread_pool pool;
+
+
 int main()
 {
     SetConsoleCP(65001);
     SetConsoleOutputCP(65001);
     setlocale(LC_ALL, "ru_RU.UTF8");
 
-    std::string p;
-    std::map<std::string, int> m;
+    //std::string p;
+    //std::map<std::string, int> m;
 
     std::string BD_host;
     std::string BD_port;
@@ -51,18 +55,14 @@ int main()
     links_to_scrape.reserve(rep);
     std::vector<std::string> discovered_links;
     discovered_links.reserve(rep);
-    std::vector<std::string> buffer_links;
-    buffer_links.reserve(rep);
     std::vector<std::string> buffer_links_for_all;
     buffer_links_for_all.reserve(rep);
-    std::vector<std::string> del_already_verified;
-    del_already_verified.reserve(rep);
     size_t current_recurs = 0;
-    std::string all_text;
+    size_t number_sites_verified = 50;
     int min = 3;
     int max = 33;
-    if (links_to_scrape.empty()) std::cout << "Вектора пустые!" << std::endl;
-    else std::cout << "Вектора NONпустые!" << std::endl;
+    //mutable
+    std::mutex t_mutex = {};
     try
     {
 
@@ -119,92 +119,100 @@ int main()
         //links_to_scrape.push_back(html_start1);
         links_to_scrape.emplace_back(html_start);
         int f = 0;
+        unsigned short N{1};
         while (!links_to_scrape.empty() && (current_recurs < pars_recurs)) {
-            // define the user agent for the GET request
+            //while (!links_to_scrape.empty()) {
+            while (N>0) {
+                if (current_recurs == 0) { std::cout << "Pleas wait..." << std::endl; }
+                std::cout << "while = " << f << std::endl; f++;
+                const std::future<void> my_future = pool.submit_task(
+                    [&]{
+                        std::string link;
+                        {
+                            const std::scoped_lock tasks_lock(t_mutex);
+                            link = links_to_scrape.at(0);
+                            links_to_scrape.erase(links_to_scrape.begin());
+                        }
+                        std::string all_text;
+                        std::vector<std::string> buffer_links{};
+                        std::vector<std::string> del_already_verified{};
+                        std::string p;
+                        std::map<std::string, int> m;
+                        if (func_pars(link, buffer_links, all_text)) {
 
-            std::string link{};
-            link = links_to_scrape.at(0);
-            links_to_scrape.erase(links_to_scrape.begin());
-            if (current_recurs == 0) { std::cout << "Pleas wait..." << std::endl; }
-            //func
-            std::cout << "111while = " << f << std::endl; f++;
+                            //if (all_text[0] != '0') {
+                            if (!all_text.empty()) {
+                                pqxx::work xact1(c);
+                                auto r = xact1.exec("INSERT INTO Pages(Links) "
+                                    "VALUES('" + xact1.esc(link) + "') on conflict (Links) do nothing RETURNING id;");
+                                if (r.empty()) { r = xact1.exec("SELECT id FROM Pages WHERE Links = '" + xact1.esc(link) + "';"); }
+                                //pqxx::result::const_iterator ptr = r.begin();
+                                std::string pages_id_str = (r[0][0].as<std::string>());
+                                xact1.commit();
 
-            //link = "https://play.google.com/store/apps/details?id=org.wikipedia&referrer=utm_source%3Dportal%26utm_medium%3Dbutton%26anid%3Dadmob";
-            //std::string hh = "https://itunes.apple.com/app/apple-store/id324715238?pt=208305&ct=portal&mt=8";
-            //std::string hh = "http://apps.apple.com/us/app/wikipedia/id324715238";
-            /*std::string hh = "http://apps.apple.com/us/app/wikipedia/id324715238";
-            cpr::Response r = cpr::Get(cpr::Url{ hh });
-            std::cout << "Text = " << r.text << std::endl;
-            std::cout << "CPR cod = " << r.status_code << std::endl;
-            if (r.status_code == 0) {
-                auto error = r.error.code;
-                std::cout << "Error cod: " << r.error.message << std::endl;
-            }*/
-
-            //if (link.empty()) { std::cout << "link EMPTY" << std::endl; }
-            //std::cout << link << std::endl;
-                if (func_pars(link, buffer_links, all_text)) {
-                     
-                     //if (all_text[0] != '0') {
-                     if (!all_text.empty()) {
-                         pqxx::work xact1(c);
-                                     //std::cout << "Текущая ссылка: " << link << std::endl;
-                         auto r = xact1.exec("INSERT INTO Pages(Links) "
-                             "VALUES('" + xact1.esc(link) + "') on conflict (Links) do nothing RETURNING id;");
-                         if (r.empty()) { r = xact1.exec("SELECT id FROM Pages WHERE Links = '" + xact1.esc(link) + "';"); }
-                                     //pqxx::result::const_iterator ptr = r.begin();
-                         std::string pages_id_str = (r[0][0].as<std::string>());
-                         xact1.commit();
-                         
-                         std::wstring low = ToLower(all_text);
-                         std::stringstream words(removeParser(low, min, max));
-                         //std::stringstream words(removeParser(ToLower(all_text), min, max));
-                         pqxx::work xact2(c);
-                         while (words >> p) {
-                             m[p]++;
-                         }
-                         for (auto e : m) {
-                             r = xact2.exec("INSERT INTO Words(Word) "
-                                 "VALUES('" + xact2.esc(e.first) + "') on conflict (Word) do nothing RETURNING id;");
-                             if (r.empty()) { r = xact2.exec("SELECT id FROM Words WHERE Word = '" + xact2.esc(e.first) + "';"); }
-                             std::string words_id_str = (r[0][0].as<std::string>());
-                             std::string preobraz{ std::to_string(e.second) };
-                             xact2.exec("INSERT INTO Word_frequency(Pages_id, Words_id, Count) "
-                                 "VALUES(" + xact2.esc(pages_id_str) + ", " + xact2.esc(words_id_str) + ", " + xact2.esc(preobraz) + ") on conflict (Pages_id, Words_id) do nothing;");
-                                         //std::cout << e.first << " --> " << e.second << "\n";
-                         }
-                         xact2.commit();
-                     }
-                         //discovered_links.push_back(link);
-                }
-                 discovered_links.emplace_back(link);
-                 if (current_recurs < (pars_recurs - 1)) {
-                     
-                     for (auto stroc : buffer_links) {
-                         if ((std::find(discovered_links.begin(), discovered_links.end(), stroc) == discovered_links.end())) {
-                             if (stroc.starts_with("http")) {
-                                 del_already_verified.emplace_back(stroc);
-                                 //std::cout << url << std::endl;
-                             }
-                         }
-                     }
-                     buffer_links.clear();
-                     buffer_links_for_all.insert(buffer_links_for_all.end(), del_already_verified.begin(), del_already_verified.end());
-                 }
-                 if (current_recurs <= pars_recurs) {
-                     if (links_to_scrape.empty()) {
-                         ++current_recurs;
-                         if (!buffer_links_for_all.empty()) {
-                         std::cout << "links_to_scrape = buffer_links_for_all;" << std::endl;
-                         std::cout << "Size buffer_links_for_all - " << buffer_links_for_all.size() << std::endl;
-                             links_to_scrape = buffer_links_for_all;
-                             buffer_links_for_all.clear();
-                         }
-                         
-                     }
-                 }
-                 std::cout << "while = true" << std::endl;
-                 if (f > rep/20) break;
+                                std::wstring low = ToLower(all_text);
+                                std::stringstream words(removeParser(low, min, max));
+                                //std::stringstream words(removeParser(ToLower(all_text), min, max));
+                                pqxx::work xact2(c);
+                                while (words >> p) {
+                                    m[p]++;
+                                }
+                                for (auto e : m) {
+                                    r = xact2.exec("INSERT INTO Words(Word) "
+                                        "VALUES('" + xact2.esc(e.first) + "') on conflict (Word) do nothing RETURNING id;");
+                                    if (r.empty()) { r = xact2.exec("SELECT id FROM Words WHERE Word = '" + xact2.esc(e.first) + "';"); }
+                                    std::string words_id_str = (r[0][0].as<std::string>());
+                                    std::string preobraz{ std::to_string(e.second) };
+                                    xact2.exec("INSERT INTO Word_frequency(Pages_id, Words_id, Count) "
+                                        "VALUES(" + xact2.esc(pages_id_str) + ", " + xact2.esc(words_id_str) + ", " + xact2.esc(preobraz) + ") on conflict (Pages_id, Words_id) do nothing;");
+                                    //std::cout << e.first << " --> " << e.second << "\n";
+                                }
+                                xact2.commit();
+                            }
+                        }
+                        {
+                            const std::scoped_lock tasks_lock(t_mutex);
+                            discovered_links.emplace_back(link);
+                        }
+                        if (current_recurs < (pars_recurs - 1)) {
+                            {
+                                const std::scoped_lock tasks_lock(t_mutex);
+                                for (auto stroc : buffer_links) {
+                                    if ((std::find(discovered_links.begin(), discovered_links.end(), stroc) == discovered_links.end())) {
+                                        if (stroc.starts_with("http")) {
+                                            del_already_verified.emplace_back(stroc);
+                                        }
+                                    }
+                                }
+                                //buffer_links.clear();
+                                buffer_links_for_all.insert(buffer_links_for_all.end(), del_already_verified.begin(), del_already_verified.end());
+                            }
+                        }
+                    });
+                if (N > 0) --N;
+                //if (pool.get_tasks_running() > 100) {
+                if (f > number_sites_verified) {
+                    current_recurs = pars_recurs;
+                    break;
+                }  
+            }
+            pool.wait();
+            ++current_recurs;
+            if (current_recurs < pars_recurs) {
+                    if (!buffer_links_for_all.empty()) {
+                        std::cout << "links_to_scrape = buffer_links_for_all;" << std::endl;
+                        std::cout << "Size buffer_links_for_all - " << (N = buffer_links_for_all.size()) << std::endl;
+                        for (auto stroc : buffer_links_for_all) {
+                            if ((std::find(discovered_links.begin(), discovered_links.end(), stroc) == discovered_links.end())) {
+                                if (stroc.starts_with("http")) {
+                                    links_to_scrape.emplace_back(stroc);
+                                }
+                            }
+                        }
+                        //links_to_scrape = buffer_links_for_all;
+                        buffer_links_for_all.clear();
+                    }
+            }
         }
              c.close();
     }
@@ -220,13 +228,8 @@ int main()
          std::cout << error_message << std::endl;
      }
 
-    // auto response = cpr::Get(cpr::Url{ " " });
-     //std::cerr << "Ошибка запроса -> " << response.error.message << std::endl;
-     //response.~Response();
-     //if (&response != nullptr) std::cout << "response = nullptr" << std::endl; //*/
-
-            std::cout << "Конец программы zzz!" << std::endl;
-            std::getchar();
-            return 0;// EXIT_SUCCESS;
+     std::cout << "Конец программы zzz!" << std::endl;
+     std::getchar();
+     return 0;// EXIT_SUCCESS;
         
 }

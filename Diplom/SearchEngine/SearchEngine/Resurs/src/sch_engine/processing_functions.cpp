@@ -5,14 +5,8 @@
 #include <windows.h>
 #include <filesystem>
 
-//#include "cpr/cpr.h"
-//#include "libxml/HTMLparser.h"
-//#include "libxml/xpath.h"
-
-//UTF8 -> UTF16 conversion
 std::wstring toUTF16(const std::string& input)
 {
-    // get length
     int length = MultiByteToWideChar(CP_UTF8, NULL,
         input.c_str(), input.size(),
         NULL, 0);
@@ -111,18 +105,7 @@ std::wstring ToLower(std::string string) {
 
 
 void parseHTML(const xmlXPathContextPtr& context, std::string& returnString) {
-    // �������������� ������ HTML
-    //*htmlDocPtr doc = htmlReadMemory(html.c_str(), html.size(), NULL, NULL, HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING);
-    //if (doc == NULL) {
-      //  std::cerr << "Failed to parse HTML" << std::endl;
-        //return;
-    //}//
-
-    // ��������� ������ XPath ��� ���������� ������
-    //xmlChar* xpath = (xmlChar*)"lower-case(//text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz')";
-    //xmlChar* xpath = (xmlChar*)"translate(//text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz')";
     xmlChar* xpath = (xmlChar*)"//text()";
-    //xmlXPathContextPtr context = xmlXPathNewContext(doc);
     xmlXPathObjectPtr result = xmlXPathEvalExpression(xpath, context);
 
     if (result != NULL) {
@@ -141,9 +124,6 @@ void parseHTML(const xmlXPathContextPtr& context, std::string& returnString) {
         xmlXPathFreeObject(result);
     }
     else std::cout << "NOT FINDE NODE" << std::endl;// << all_text << std::endl;
-    // ����������� �������
-    //xmlXPathFreeContext(context);
-    //xmlFreeDoc(doc);
 }
 
 
@@ -179,63 +159,6 @@ std::string removeParser(std::wstring a, int& const min, int& const max) {
 }
 
 
-////xz
-
-/*void parseStory(htmlDocPtr doc, xmlNodePtr cur, std::string& all_text) {
-    xmlChar* key;
-    cur = cur->xmlChildrenNode;
-    while (cur != NULL) {
-        //if ((!xmlStrcmp(cur->name, (const xmlChar*)"keyword"))) {
-        key = xmlNodeListGetString(doc, cur->xmlChildrenNode, 1);
-
-        //auto v = cur->content;
-        //xmlChar* key1 = xmlNodeListGetString(doc1, cur->xmlChildrenNode, 1);
-        //fprintf(v, "cont");
-        //printf("keyword: %s\n", v);
-
-        //if(v) xmlFree(v);
-
-        printf("keyword: %s\n", key);
-
-        if (key) {
-            std::string strok(reinterpret_cast<char*>(key));
-            //key = _strdup(strok);
-            all_text += " " + strok;
-            xmlFree(key);
-        }
-        cur = cur->next;
-    }
-    // return;
-}*/
-
-
-
-//std::string wordsPars(std::string& const a, int& const min, int& const max) {
-//    //setlocale(LC_ALL, "ru_RU.UTF-8");
-//    const std::string separators{ " ,;:.\"!?'*\n" };
-//    //const std::string separators{ " ,/\n" };
-//    std::vector<std::string> words; // ������ ��� �������� ����
-//    //const std::string s2(a.begin(), a.end());
-//    size_t start{ a.find_first_not_of(separators) }; // ��������� ������ ������� �����
-//    while (start != std::string::npos) // ��������, ���� � ������ �� �������� ������ ��������, ����� separators
-//    {
-//        size_t end = a.find_first_of(separators, start + 1); // �������, ��� ��������� �����
-//        if (end == std::string::npos) // ���� �� ������ �� ���� �� ��������-������������
-//            end = a.length();        // ������������� ���������� end �� ����� ������
-//        words.push_back(a.substr(start, end - start)); // ��������� � ������ �����
-//        start = a.find_first_not_of(separators, end + 1); // ������� ��������� ������ ���������� ����� � ����������������� start
-//    }
-//    std::string all_words;
-//    for (const auto& word : words)
-//    {
-//        all_words += word;
-//        all_words += ' ';
-//
-//    }
-//    //all_words += '!';
-//    return all_words;
-//}
-
 bool func_pars(std::string& link, std::vector<std::string>& buffer_links, std::string& all_text) {
     std::string err{1};
         bool pars_ok{ true };
@@ -246,9 +169,9 @@ bool func_pars(std::string& link, std::vector<std::string>& buffer_links, std::s
                 std::string const u = link;
                 cpr::Response response = cpr::Get(cpr::Url{ u }, headers);
                 int cod_int = response.status_code;
-                std::cout << "CPR cod = " << cod_int << std::endl;
+                //std::cout << "CPR cod = " << cod_int << std::endl;
                 std::string cod_str = std::to_string(cod_int);
-                if ((cod_int >= 400) || (cod_int == 500)) {
+                if (cod_int >= 400) {
                     err = "Error [";
                     err += cod_str;
                     err += "] response status code";
@@ -272,15 +195,8 @@ bool func_pars(std::string& link, std::vector<std::string>& buffer_links, std::s
                             xmlXPathSetContextNode(url_html_link, context);
                             if (reinterpret_cast<char*>(xmlGetProp(url_html_link, (xmlChar*)"href"))){
                                 url = std::string(reinterpret_cast<char*>(xmlGetProp(url_html_link, (xmlChar*)"href")));
-                                //std::cout << "url = " << url << std::endl;
                             }
                             buffer_links.emplace_back(url);
-                            //if ((std::find(discov.begin(), discov.end(), url) == discov.end()) && (url != link)) {
-                            //    if ((url.starts_with("http")) && (&url != nullptr)) {
-                            //    buffer_links.push_back(url);
-                            //    //std::cout << url << std::endl;
-                            //    }
-                            //}
                         }
                     }
                     parseHTML(context, all_text);
