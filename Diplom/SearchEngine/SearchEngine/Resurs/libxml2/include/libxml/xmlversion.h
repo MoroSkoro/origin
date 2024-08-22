@@ -60,7 +60,7 @@
  *
  * Whether the allocation hooks are per-thread
  */
-#if 1
+#if 0
 #define LIBXML_THREAD_ALLOC_ENABLED
 #endif
 
@@ -132,7 +132,7 @@
  *
  * Whether the FTP support is configured in
  */
-#if 0
+#if 1
 #define LIBXML_FTP_ENABLED
 #endif
 
@@ -168,7 +168,7 @@
  *
  * Whether the deprecated APIs are compiled in for compatibility
  */
-#if 0
+#if 1
 #define LIBXML_LEGACY_ENABLED
 #endif
 
@@ -213,7 +213,7 @@
  *
  * Whether support for XPointer locations is configured in
  */
-#if 1
+#if 0
 #define LIBXML_XPTR_LOCS_ENABLED
 #endif
 
