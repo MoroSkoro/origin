@@ -58,12 +58,13 @@ qt_add_executable(AirportInspector
 
 #set_target_properties(AirportInspector PROPERTIES MACOSX_BUNDLE TRUE WIN32_EXECUTABLE TRUE)
 
-target_link_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/PG_Libs)
+#target_link_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/PG_Libs)
+target_link_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/psqlODBC)
 target_link_libraries(AirportInspector PRIVATE Qt6::Widgets Qt6::Sql Qt6::Concurrent
                                             Qt6::Charts
                                              libcrypto-3-x64
-                                             libiconv-2
-                                             libintl-9
+                                             #libiconv-2
+                                             #libintl-9
                                              libpq
                                              libssl-3-x64)
 
@@ -81,7 +82,7 @@ target_link_libraries(AirportInspector PRIVATE Qt6::Widgets Qt6::Sql Qt6::Concur
     #WIN32_EXECUTABLE TRUE
 #)
 
-include(GNUInstallDirs)
+#include(GNUInstallDirs) удалил переменную среды
 install(TARGETS AirportInspector
     BUNDLE DESTINATION .
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
